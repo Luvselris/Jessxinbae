@@ -39,7 +39,7 @@
       display: flex;
       justify-content: center;
     }
-    .container { width: 100%; max-width: 460px; }
+    .container { width: 100%; max-width: 460px; }f
     
     .card {
       background: #ffffff;
@@ -392,7 +392,7 @@
     const file = event.target.files[0];
     if (!file) return;
     try {
-      const b64 = await compressImg(file, 650, 0.75);
+      const b64 = await compressImg(file, 1200, 0.92);
       document.getElementById(targetId).value = b64;
     } catch (e) {
       alert("แปลงรูปไม่ผ่าน");
@@ -500,7 +500,7 @@
     
     for (const f of files) {
       try {
-        const b64 = await compressImg(f, 500, 0.7);
+        const b64 = await compressImg(f, 1200, 0.92);
         highlightsData[hlIdx].images.push(b64);
       } catch (err) {}
     }
