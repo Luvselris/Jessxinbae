@@ -536,36 +536,35 @@
       cursor: pointer;
     }
     .story-body {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  padding: 0 4px;
-}
-
-.story-body img {
-  width: 100%;
-  height: 100%;
-  max-height: 92vh;
-  object-fit: contain;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: auto;
-}
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
     }
-.story-nav-btn {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  z-index: 99999;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
+    .story-body img {
+      width: 100%;
+      height: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      image-rendering: -webkit-optimize-contrast;
+    }
+    .story-nav-btn {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      z-index: 99999;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .story-nav-left { left: 0; }
     .story-nav-right { right: 0; }
@@ -728,9 +727,9 @@
       <button class="story-close" onclick="closeStoryModal()">✕</button>
     </div>
     <div class="story-body">
-      <div class="story-nav-btn story-nav-left" onclick="prevStorySlide()"></div>
-      <img id="storyActiveImg" src="" alt="Story">
-      <div class="story-nav-btn story-nav-right" onclick="nextStorySlide()"></div>
+      <div class="story-nav-btn story-nav-left" id="storyNavLeft"></div>
+      <img id="storyActiveImg" src="" alt="Story" draggable="false">
+      <div class="story-nav-btn story-nav-right" id="storyNavRight"></div>
     </div>
   </div>
 
@@ -751,15 +750,8 @@
       }
     }
 
-    // สั่งเล่นทันทีตั้งแต่โหลด
-    window.addEventListener('DOMContentLoaded', () => {
-      unlockAndPlayAudio();
-    });
-    window.addEventListener('load', () => {
-      unlockAndPlayAudio();
-    });
-
-    // ปลดล็อกทันทีเมื่อมีการขยับหน้าจอ สัมผัส หรือเลื่อนดูเว็บ
+    window.addEventListener('DOMContentLoaded', unlockAndPlayAudio);
+    window.addEventListener('load', unlockAndPlayAudio);
     ['touchstart', 'touchend', 'click', 'pointerdown', 'scroll'].forEach(event => {
       document.addEventListener(event, function runOnce() {
         unlockAndPlayAudio();
@@ -914,6 +906,7 @@
       });
     });
 
+    // Story Viewer
     function openStory(idx) {
       activeHlIdx = idx;
       activeSlideIdx = 0;
@@ -958,7 +951,7 @@
       slideTimer = setTimeout(() => { nextStorySlide(); }, 5000);
     }
 
-function nextStorySlide() {
+    function nextStorySlide() {
       clearTimeout(slideTimer);
       const hl = highlightsData[activeHlIdx];
       if (activeSlideIdx < hl.images.length - 1) {
@@ -982,6 +975,35 @@ function nextStorySlide() {
       document.getElementById('storyModal').classList.remove('show');
     }
 
+    // ระบบตรวจจับการแตะเปลี่ยนสตอรี่บนมือถือโดยตรง
+    const navRight = document.getElementById('storyNavRight');
+    const navLeft = document.getElementById('storyNavLeft');
+
+    function bindTapHandler(element, callback) {
+      if (!element) return;
+      let startX = 0, startY = 0, startTime = 0;
+
+      element.addEventListener('pointerdown', (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
+        startTime = Date.now();
+      }, { passive: true });
+
+      element.addEventListener('pointerup', (e) => {
+        const diffX = Math.abs(e.clientX - startX);
+        const diffY = Math.abs(e.clientY - startY);
+        const diffTime = Date.now() - startTime;
+        if (diffX < 15 && diffY < 15 && diffTime < 450) {
+          e.preventDefault();
+          callback();
+        }
+      });
+    }
+
+    bindTapHandler(navRight, nextStorySlide);
+    bindTapHandler(navLeft, prevStorySlide);
+
+    // เลเยอร์ลูกเล่นลอย
     const floatBox = document.getElementById('floatingLayer');
     function createFloatItem() {
       const isPng = Math.random() > 0.5;
