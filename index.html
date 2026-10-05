@@ -529,10 +529,10 @@
 </head>
 <body>
 
-  <!-- เพลงเล่นทันทีเมื่อเข้าเว็บ (ไม่มีหน้าต่างกดเข้าสู่ระบบใดๆ ทั้งสิ้น) -->
+  <!-- เพลงเล่นทันที autoplay playsinline -->
   <audio id="bgMusic" loop autoplay playsinline preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3"></audio>
 
-  <!-- เลเยอร์ลูกเล่นลอยไปมา: เฉพาะ ♡ 🍮 🪽 ☁️ และรูป PNG ตามที่สั่ง -->
+  <!-- เลเยอร์ลูกเล่นลอย: เฉพาะ ♡ 🍮 🪽 ☁️ และรูป PNG -->
   <div class="floating-container" id="floatingContainer"></div>
 
   <div class="container">
@@ -559,7 +559,7 @@
       </div>
     </div>
 
-    <!-- 4 ไฮไลท์สตอรี่ (ใส่รูปได้อินฟินิตี้) -->
+    <!-- 4 ไฮไลท์สตอรี่ -->
     <div class="highlights-scroll" id="highlightsBar"></div>
 
     <!-- 4 แท็บเมนู -->
@@ -570,7 +570,7 @@
       <button class="tab-btn" onclick="switchTab('contact')">Contact</button>
     </div>
 
-    <!-- แท็บ 1: Home (ตารางโพสต์ตัวอย่างงาน 3 ช่องแบบ IG) -->
+    <!-- แท็บ 1: Home (ตารางโพสต์ 3 ช่อง) -->
     <div class="tab-content active" id="tab-home">
       <div class="section-card">
         <div class="posts-grid" id="postsGrid">
@@ -579,12 +579,12 @@
       </div>
     </div>
 
-    <!-- แท็บ 2: Review (รวมรีวิวและไฮไลท์สตอรี่) -->
+    <!-- แท็บ 2: Review -->
     <div class="tab-content" id="tab-review">
       <div class="review-list" id="reviewList"></div>
     </div>
 
-    <!-- แท็บ 3: Details (รายละเอียดและคำขอบคุณ) -->
+    <!-- แท็บ 3: Details -->
     <div class="tab-content" id="tab-details">
       <div class="details-box">
         <div class="details-text" id="detailsText">welcome to luvselris
@@ -595,14 +595,14 @@
       </div>
     </div>
 
-    <!-- แท็บ 4: Contact (ช่องทางการติดต่อ 3 ช่องทาง) -->
+    <!-- แท็บ 4: Contact -->
     <div class="tab-content" id="tab-contact">
       <div class="contact-list" id="contactList"></div>
     </div>
 
   </div>
 
-  <!-- Modal ดูงานขนาดจริง 100% -->
+  <!-- Modal ดูงานขนาดจริง -->
   <div class="modal-overlay" id="postModal">
     <div class="modal-card">
       <button type="button" class="modal-close" onclick="closeModal()">✕</button>
@@ -650,11 +650,30 @@
     let activeStoryImgIdx = 0;
     let storyTimer = null;
 
-    // ลูกเล่นเฉพาะที่สั่ง: ♡ 🍮 🪽 ☁️ และรูป PNG
     const allowedEmojis = ['♡', '🍮', '🪽', '☁️'];
     let customFloatPng = 'https://i.ibb.co/tTxJ3Ykc/IMG-3650.png';
 
-    // ดึงข้อมูล Realtime จาก bebselris_pure_pink
+    // เล่นเพลงทันที
+    const music = document.getElementById('bgMusic');
+    const musicText = document.getElementById('musicText');
+
+    music.play().then(() => {
+      musicText.textContent = "pause music";
+    }).catch(() => {
+      musicText.textContent = "play music";
+    });
+
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+        musicText.textContent = "pause music";
+      } else {
+        music.pause();
+        musicText.textContent = "play music";
+      }
+    }
+
+    // ดึงข้อมูล Realtime
     db.collection("bebselris_pure_pink").doc("config").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
@@ -681,16 +700,15 @@
         }
 
         if (d.musicUrl) {
-          const m = document.getElementById('bgMusic');
-          if (m && m.src !== d.musicUrl) {
-            m.src = d.musicUrl;
-            m.play().catch(() => {});
+          if (music.src !== d.musicUrl) {
+            music.src = d.musicUrl;
+            music.play().catch(() => {});
           }
         }
       }
     });
 
-    // ดึงโพสต์งาน 3 ช่องแบบ IG จาก bebselris_pure_posts
+    // ดึงโพสต์งาน 3 ช่อง
     db.collection("bebselris_pure_posts").orderBy("createdAt", "desc").onSnapshot(snapshot => {
       const grid = document.getElementById('postsGrid');
       grid.innerHTML = '';
@@ -707,39 +725,6 @@
         grid.appendChild(slot);
       });
     });
-
-    // Auto-play เพลงทันทีเมื่อเข้าเว็บ (ไม่มี Gate)
-    const music = document.getElementById('bgMusic');
-    const musicText = document.getElementById('musicText');
-
-    function startMusicImmediately() {
-      music.play().then(() => {
-        musicText.textContent = "pause music";
-      }).catch(() => {
-        musicText.textContent = "play music";
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      startMusicImmediately();
-      ['click', 'touchstart'].forEach(evt => {
-        document.body.addEventListener(evt, () => {
-          if (music.paused) {
-            music.play().then(() => { musicText.textContent = "pause music"; }).catch(() => {});
-          }
-        }, { once: true });
-      });
-    });
-
-    function toggleMusic() {
-      if (music.paused) {
-        music.play();
-        musicText.textContent = "pause music";
-      } else {
-        music.pause();
-        musicText.textContent = "play music";
-      }
-    }
 
     function renderHighlights(hl) {
       const bar = document.getElementById('highlightsBar');
