@@ -144,7 +144,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* 1. หน้า HOME: แบนเนอร์ลอยอยู่ด้านบนโปรไฟล์แบบภาพ babyselris ♡ */
+    /* 1. หน้า HOME */
     .banner-float-box {
       width: 100%;
       height: 155px;
@@ -153,7 +153,7 @@
       border: 1.5px solid var(--border-pink);
       background: #ffffff;
       box-shadow: 0 8px 24px var(--pink-glow);
-      margin-bottom: 22px; /* เว้นระยะให้แบนเนอร์ลอยเดี่ยวๆ เหนือโปรไฟล์ */
+      margin-bottom: 22px;
     }
 
     .banner-float-box img {
@@ -560,10 +560,10 @@
 </head>
 <body>
 
-  <!-- เพลง Autoplay ทันทีที่เข้าเว็บ -->
-  <audio id="bgMusic" loop autoplay playsinline preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3"></audio>
+  <!-- Audio Element -->
+  <audio id="bgMusic" loop preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3"></audio>
 
-  <!-- เลเยอร์ลูกเล่นลอย: เฉพาะ ♡ 🍮 ☁️️ และรูป PNG -->
+  <!-- เลเยอร์ลูกเล่นลอย -->
   <div class="floating-layer" id="floatingLayer"></div>
 
   <div class="container">
@@ -581,12 +581,10 @@
 
     <!-- 1. แท็บ HOME -->
     <div class="tab-content active" id="tab-home">
-      <!-- แบนเนอร์ลอยอยู่ด้านบนโปรไฟล์แบบภาพ babyselris ♡ -->
       <div class="banner-float-box">
         <img id="mainBanner" src="https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif" alt="Banner">
       </div>
 
-      <!-- โปรไฟล์อยู่ด้านล่างแบนเนอร์ -->
       <div class="profile-center-wrap">
         <div class="profile-circle-wrap">
           <img id="mainProfile" src="https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg" alt="Profile">
@@ -605,7 +603,6 @@
         <span>♡</span> <span>review Jessxinbae</span>
       </div>
 
-      <!-- ไฮไลท์สตอรี่ 4 อัน (อินฟินิตี้รูปภาพ) -->
       <div class="highlights-row" id="highlightsBar"></div>
     </div>
 
@@ -642,7 +639,6 @@
       </div>
 
       <div class="contact-card-box" id="contactListWrap">
-        <!-- ช่องทาง 1: Line Official Acccount -->
         <a href="https://lin.ee/xJ4OSOX" target="_blank" class="contact-bubble-link">
           <div class="contact-bubble-left">
             <div class="contact-circle-icon">♡</div>
@@ -654,7 +650,6 @@
           <span style="color:#f2a7be; font-size:13px;">♡</span>
         </a>
 
-        <!-- ช่องทาง 2: Line ส่วนตัว (ไลน์หลัก) -->
         <a href="https://line.me/ti/p/2kUga_abxE" target="_blank" class="contact-bubble-link">
           <div class="contact-bubble-left">
             <div class="contact-circle-icon">♡</div>
@@ -666,7 +661,6 @@
           <span style="color:#f2a7be; font-size:13px;">♡</span>
         </a>
 
-        <!-- ช่องทาง 3: Instagram (ไอจีร้าน) -->
         <a href="https://www.instagram.com/jesselvucat_?stkn=MW1xbGFrYWF5MDdxag%3D%3D&utm_source=qr" target="_blank" class="contact-bubble-link">
           <div class="contact-bubble-left">
             <div class="contact-circle-icon">♡</div>
@@ -704,8 +698,9 @@
       </div>
 
       <div class="thanks-bubble" id="thanksBubbleText">
-       <div>♡ 제스 Shop을 찾아주셔서 감사해요! ♡</div>
-       <div>♡ ขอบคุณที่อุดหนุนและใช้บริการนะคะ ♡</div>
+        <div>♡ 제스 Shop을 찾아주셔서 감사해요! ♡</div>
+        <div>♡ ขอบคุณที่อุดหนุนและใช้บริการนะคะ ♡</div>
+      </div>
     </div>
 
   </div>
@@ -727,24 +722,44 @@
   </div>
 
   <script>
-    // สั่งเล่นเพลงระดับ Native ทันที
     const audio = document.getElementById('bgMusic');
-    audio.play().catch(() => {});
 
-    function forceAudioPlay() {
+    // ระบบปลดล็อก Autoplay Policy
+    let audioContext;
+    function unlockAndPlayAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
       if (audio.paused) {
         audio.play().catch(() => {});
       }
     }
-    // ปลดล็อกทันทีเมื่อแตะส่วนใดก็ตามของหน้าจอ
-    window.addEventListener('load', forceAudioPlay);
-    ['click', 'touchstart', 'scroll'].forEach(evt => {
-      document.addEventListener(evt, forceAudioPlay, { once: true, passive: true });
+
+    // สั่งเล่นทันทีตั้งแต่โหลด
+    window.addEventListener('DOMContentLoaded', () => {
+      unlockAndPlayAudio();
+    });
+    window.addEventListener('load', () => {
+      unlockAndPlayAudio();
+    });
+
+    // ปลดล็อกทันทีเมื่อมีการขยับหน้าจอ สัมผัส หรือเลื่อนดูเว็บ
+    ['touchstart', 'touchend', 'click', 'pointerdown', 'scroll'].forEach(event => {
+      document.addEventListener(event, function runOnce() {
+        unlockAndPlayAudio();
+        document.removeEventListener(event, runOnce);
+      }, { passive: true });
     });
 
     function toggleAudio() {
-      if (audio.paused) audio.play();
-      else audio.pause();
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
     }
 
     const firebaseConfig = {
@@ -780,7 +795,6 @@
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
-    // ดึงข้อมูล Realtime จาก babyselris_exact_site
     db.collection("babyselris_exact_site").doc("config").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
@@ -791,7 +805,6 @@
         if (d.profileImg) document.getElementById('mainProfile').src = d.profileImg;
 
         if (d.details) document.getElementById('detailsContentText').textContent = d.details;
-        // if (d.thanksText) document.getElementById('thanksBubbleText').textContent = d.thanksText;
 
         if (d.floatPng) customFloatPng = d.floatPng;
 
@@ -802,7 +815,7 @@
 
         if (d.musicUrl && audio.src !== d.musicUrl) {
           audio.src = d.musicUrl;
-          audio.play().catch(() => {});
+          unlockAndPlayAudio();
         }
       } else {
         renderHighlights(highlightsData);
@@ -825,7 +838,6 @@
       });
     }
 
-    // ส่งรีวิว
     function selectStar(num) {
       currentRating = num;
       const btns = document.querySelectorAll('.star-btn');
@@ -867,7 +879,6 @@
       }
     }
 
-    // ฟังรายการรีวิวสด
     db.collection("babyselris_exact_reviews").orderBy("createdAt", "desc").onSnapshot(snap => {
       const feed = document.getElementById('feedbackFeed');
       feed.innerHTML = '';
@@ -890,7 +901,6 @@
       });
     });
 
-    // Story Viewer อินฟินิตี้รูปภาพ
     function openStory(idx) {
       activeHlIdx = idx;
       activeSlideIdx = 0;
@@ -957,7 +967,6 @@
       document.getElementById('storyModal').classList.remove('show');
     }
 
-    // เลเยอร์ลูกเล่นลอย
     const floatBox = document.getElementById('floatingLayer');
     function createFloatItem() {
       const isPng = Math.random() > 0.5;
@@ -968,7 +977,7 @@
       el.style.left = Math.random() * 90 + 'vw';
       el.style.animationDuration = (8 + Math.random() * 5) + 's';
       floatBox.appendChild(el);
-      setTimeout(() => { el.remove(); }, 14000);
+      setTimeout(() => el.remove(), 14000);
     }
     setInterval(createFloatItem, 1400);
   </script>
