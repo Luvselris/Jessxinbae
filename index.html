@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">welcome to bebselris ♡</title>
+  <title id="pageTitle">babyselris ♡</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
-      --palette-bg-top: #fff0f5;
-      --palette-bg-mid: #fce7f0;
-      --palette-bg-bot: #fadbe7;
-      --palette-card: rgba(255, 255, 255, 0.96);
-      --palette-soft: #f5d3e4;
-      --palette-main: #f2a7be;
-      --palette-deep: #db7b97;
-      --palette-border: #f7d6e2;
-      --palette-text: #4e3d43;
-      --palette-muted: #947e85;
-      --palette-glow: rgba(242, 167, 190, 0.25);
+      --bg-pink: #fff5f8;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --border-pink: #fde2ec;
+      --border-dashed: #fbcfe0;
+      --text-dark: #4a3e42;
+      --text-muted: #8c7780;
+      --pink-btn: #f08ea8;
+      --pink-btn-hover: #e67894;
+      --pink-glow: rgba(240, 142, 168, 0.15);
+      --star-color: #f6b756;
     }
 
     * {
@@ -36,15 +34,15 @@
     }
 
     body {
-      background: radial-gradient(circle at top, #ffffff 0%, var(--palette-bg-top) 45%, var(--palette-bg-mid) 80%, var(--palette-bg-bot) 100%);
-      color: var(--palette-text);
+      background: radial-gradient(circle at top, #ffffff 0%, var(--bg-pink) 60%, #fae6ed 100%);
+      color: var(--text-dark);
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
     }
 
     /* เลเยอร์ลูกเล่นลอย */
-    .floating-container {
+    .floating-layer {
       position: fixed;
       top: 0;
       left: 0;
@@ -57,141 +55,187 @@
 
     .float-item {
       position: absolute;
-      bottom: -70px;
-      animation: floatUpAnim 12s linear infinite;
-      opacity: 0.75;
-      pointer-events: none;
+      bottom: -60px;
+      animation: floatUp 12s linear infinite;
+      opacity: 0.7;
     }
 
     .float-emoji {
-      font-size: 22px;
-      filter: drop-shadow(0 2px 6px var(--palette-glow));
+      font-size: 20px;
+      filter: drop-shadow(0 2px 5px var(--pink-glow));
     }
 
     .float-png {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       object-fit: contain;
-      filter: drop-shadow(0 4px 10px var(--palette-glow));
+      filter: drop-shadow(0 3px 8px var(--pink-glow));
     }
 
-    @keyframes floatUpAnim {
+    @keyframes floatUp {
       0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      15% { opacity: 0.85; }
-      85% { opacity: 0.85; }
+      15% { opacity: 0.8; }
+      85% { opacity: 0.8; }
       100% { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
     }
 
     .container {
-      max-width: 440px;
+      max-width: 430px;
       margin: 0 auto;
-      padding: 16px 14px 80px;
+      padding: 18px 16px 80px;
       position: relative;
       z-index: 2;
     }
 
-    /* Profile Box */
-    .profile-card {
-      background: var(--palette-card);
-      backdrop-filter: blur(14px);
-      border-radius: 30px;
-      padding: 12px 14px 22px;
-      box-shadow: 0 10px 28px var(--palette-glow);
-      border: 2px solid #ffffff;
+    /* แถบเมนูด้านบน */
+    .top-nav {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-pink);
+      border-radius: 26px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px var(--pink-glow);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      background: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 20px;
+      cursor: pointer;
       text-align: center;
-      margin-bottom: 14px;
+      transition: all 0.2s;
     }
 
-    .banner-container {
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--pink-btn);
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(240, 142, 168, 0.2);
+    }
+
+    .music-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid var(--border-pink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-left: 6px;
+    }
+
+    /* แท็บคอนเทนต์ */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 1. หน้า HOME */
+    .banner-card {
       width: 100%;
-      height: 145px;
-      border-radius: 22px;
+      height: 150px;
+      border-radius: 24px;
       overflow: hidden;
-      background: var(--palette-bg-mid);
-      border: 1px solid #ffffff;
+      border: 1.5px solid var(--border-pink);
+      background: #ffffff;
+      box-shadow: 0 6px 20px var(--pink-glow);
+      margin-bottom: -50px;
     }
 
-    .banner-img {
+    .banner-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
     .profile-wrap {
+      text-align: center;
       position: relative;
-      margin-top: -50px;
-      display: inline-block;
-      width: 96px;
-      height: 96px;
+      z-index: 3;
+      margin-bottom: 12px;
     }
 
-    .profile-img {
-      width: 84px;
-      height: 84px;
+    .profile-img-wrap {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto;
+      border-radius: 50%;
+      padding: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px var(--border-pink), 0 8px 20px var(--pink-glow);
+    }
+
+    .profile-img-wrap img {
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 3.5px solid #ffffff;
-      box-shadow: 0 6px 18px var(--palette-glow);
-      background: #ffffff;
-      position: absolute;
-      bottom: 0;
-      left: 6px;
     }
 
-    .discord-frame {
-      position: absolute;
-      inset: -4px;
-      width: 104px;
-      height: 104px;
-      object-fit: contain;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .store-name {
-      font-size: 19px;
+    .store-title {
+      font-size: 20px;
       font-weight: 700;
-      color: var(--palette-text);
-      margin-top: 8px;
-      letter-spacing: 0.3px;
+      color: var(--text-dark);
+      margin-top: 10px;
+      text-align: center;
     }
 
-    .bio-text {
+    .bio-dashed-box {
+      background: #ffffff;
+      border: 1.5px dashed var(--border-dashed);
+      border-radius: 20px;
+      padding: 16px 14px;
+      margin-top: 14px;
+      text-align: center;
+      line-height: 1.7;
       font-size: 13px;
-      line-height: 1.65;
-      color: var(--palette-muted);
+      color: var(--text-muted);
       white-space: pre-line;
-      margin-top: 6px;
-      padding: 0 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
     }
 
-    .music-bar {
-      display: inline-flex;
+    .review-header-label {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 22px 0 12px 2px;
+      display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 10px;
-      padding: 5px 16px;
-      border-radius: 20px;
-      background: #ffffff;
-      border: 1.5px solid var(--palette-border);
-      color: var(--palette-deep);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 12px var(--palette-glow);
     }
 
-    /* 4 ไฮไลท์สตอรี่ */
-    .highlights-scroll {
+    .highlights-row {
       display: flex;
-      gap: 14px;
-      padding: 8px 4px 14px;
+      gap: 12px;
       overflow-x: auto;
+      padding-bottom: 8px;
       scrollbar-width: none;
     }
-    .highlights-scroll::-webkit-scrollbar { display: none; }
-    
-    .highlight-item {
+
+    .highlights-row::-webkit-scrollbar { display: none; }
+
+    .hl-item {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -199,259 +243,250 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    .highlight-ring {
+
+    .hl-ring {
       width: 66px;
       height: 66px;
       border-radius: 50%;
       padding: 2.5px;
-      background: linear-gradient(135deg, var(--palette-soft), var(--palette-main));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px var(--palette-glow);
+      background: #ffffff;
+      border: 2px solid var(--border-dashed);
+      box-shadow: 0 4px 12px var(--pink-glow);
     }
-    .highlight-thumb {
+
+    .hl-ring img {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #ffffff;
-      background: #fff;
-    }
-    .highlight-name {
-      font-size: 11px;
-      color: var(--palette-text);
-      max-width: 68px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      font-weight: 600;
     }
 
-    /* 4 แท็บเมนู */
-    .tabs-header {
-      display: flex;
-      border-top: 1.5px solid var(--palette-border);
-      border-bottom: 1.5px solid var(--palette-border);
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 18px;
+    .hl-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 68px;
+      white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 2. หน้า REVIEW */
+    .review-form-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-pink);
+      border-radius: 24px;
+      padding: 22px 18px;
+      text-align: center;
+      box-shadow: 0 8px 24px var(--pink-glow);
+      margin-bottom: 20px;
+    }
+
+    .review-form-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--pink-btn);
       margin-bottom: 14px;
     }
-    .tab-btn {
-      flex: 1;
-      padding: 12px 0;
+
+    .clean-input {
+      width: 100%;
+      border: 1px solid var(--border-pink);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-dark);
+      outline: none;
+      background: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .clean-input::placeholder {
+      color: #bfaab2;
+    }
+
+    .stars-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .star-btn {
       background: none;
       border: none;
-      color: var(--palette-muted);
+      font-size: 24px;
+      color: #f7d6e0;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .star-btn.active {
+      color: var(--star-color);
+      transform: scale(1.15);
+    }
+
+    .clean-textarea {
+      width: 100%;
+      border: 1px solid var(--border-pink);
+      border-radius: 16px;
+      padding: 12px 14px;
       font-size: 13px;
+      color: var(--text-dark);
+      outline: none;
+      background: #ffffff;
+      min-height: 80px;
+      resize: vertical;
+      margin-bottom: 16px;
+    }
+
+    .clean-textarea::placeholder {
+      color: #bfaab2;
+    }
+
+    .pink-pill-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #f59eb5, var(--pink-btn));
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 12px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      text-align: center;
-      border-bottom: 2.5px solid transparent;
-      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(240, 142, 168, 0.35);
     }
-    .tab-btn.active {
-      color: var(--palette-deep);
-      border-bottom: 2.5px solid var(--palette-deep);
+
+    .all-reviews-title {
+      font-size: 13.5px;
       font-weight: 700;
-      background: #fff9fb;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* แท็บ 1: Home */
-    .section-card {
-      background: var(--palette-card);
-      backdrop-filter: blur(14px);
-      border-radius: 26px;
-      padding: 16px 14px;
-      box-shadow: 0 8px 24px var(--palette-glow);
-      border: 2px solid #ffffff;
-    }
-
-    .posts-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .post-slot {
-      aspect-ratio: 1;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1.5px solid #ffffff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-      background: var(--palette-bg-mid);
-      cursor: pointer;
-    }
-
-    .post-slot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.2s ease;
-      display: block;
-    }
-    .post-slot:active img { transform: scale(0.96); }
-
-    /* แท็บ 2: Review */
-    .review-list {
+    .review-feed-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .review-card-item {
-      background: var(--palette-card);
-      border: 1.5px solid var(--palette-border);
+
+    .review-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-pink);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.02);
+    }
+
+    .review-bubble-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .review-cust-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .review-stars-display {
+      color: var(--star-color);
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .review-cust-msg {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 3. หน้า CONTACT */
+    .contact-card-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .contact-bubble-link {
+      background: #ffffff;
+      border: 1px solid var(--border-pink);
       border-radius: 20px;
       padding: 14px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px var(--palette-glow);
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text-dark);
+      box-shadow: 0 4px 14px var(--pink-glow);
     }
-    .review-card-item img {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--palette-soft);
-    }
-    .review-info { flex: 1; }
-    .review-info-title { font-size: 14px; font-weight: 700; color: var(--palette-text); }
-    .review-info-sub { font-size: 12px; color: var(--palette-muted); margin-top: 2px; }
 
-    /* แท็บ 3: Details */
-    .details-box {
-      background: var(--palette-card);
-      border: 2px solid #ffffff;
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: 0 8px 24px var(--palette-glow);
+    .contact-bubble-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .details-text {
-      font-size: 13.5px;
-      line-height: 1.7;
-      color: var(--palette-muted);
+
+    .contact-circle-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff3f6;
+      border: 1px solid var(--border-pink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .contact-info-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .contact-info-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* 4. หน้า DETAILS */
+    .details-white-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-pink);
+      border-radius: 22px;
+      padding: 18px 16px;
+      box-shadow: 0 6px 20px var(--pink-glow);
+      line-height: 1.8;
+      font-size: 13px;
+      color: var(--text-muted);
       white-space: pre-line;
+      margin-bottom: 14px;
     }
-    .thanks-card {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      background: #fff8fa;
-      border: 1.5px dashed var(--palette-main);
+
+    .details-white-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--pink-btn);
+      margin-bottom: 8px;
+    }
+
+    .thanks-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-pink);
+      border-radius: 20px;
+      padding: 14px 16px;
       text-align: center;
       font-size: 13px;
       font-weight: 600;
-      color: var(--palette-deep);
-    }
-
-    /* แท็บ 4: Contact */
-    .contact-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .contact-link-item {
-      background: var(--palette-card);
-      border: 1.5px solid var(--palette-border);
-      border-radius: 20px;
-      padding: 15px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-decoration: none;
-      color: var(--palette-text);
-      font-size: 14px;
-      font-weight: 600;
-      box-shadow: 0 6px 18px var(--palette-glow);
-      transition: transform 0.2s;
-    }
-    .contact-link-item:active { transform: scale(0.97); }
-
-    /* Modal Popup */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(25, 25, 28, 0.65);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-overlay.active { display: flex; }
-    .modal-card {
-      width: 100%;
-      max-width: 440px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 16px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-      position: relative;
-    }
-    .modal-close {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: var(--palette-bg-mid);
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      color: var(--palette-deep);
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-    .modal-img-wrap {
-      width: 100%;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff5f7;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-img-wrap img {
-      width: 100%;
-      height: auto;
-      max-height: 65vh;
-      object-fit: contain;
-      display: block;
-      border-radius: 16px;
-    }
-    .modal-desc {
-      font-size: 13.5px;
-      line-height: 1.6;
-      color: var(--palette-muted);
-      white-space: pre-line;
-      margin-bottom: 14px;
-    }
-    .modal-link-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 11px;
-      border-radius: 16px;
-      background: var(--palette-main);
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 13.5px;
-      font-weight: 600;
+      color: var(--pink-btn);
+      box-shadow: 0 4px 14px var(--pink-glow);
     }
 
     /* Story Fullscreen Viewer */
@@ -528,95 +563,105 @@
 </head>
 <body>
 
-  <!-- เพลงเล่นทันทีระดับ Native สั่งเริ่มทันทีไม่ต้องรอการกดใดๆ -->
+  <!-- Audio เล่นทันที -->
   <audio id="bgMusic" loop autoplay playsinline preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3"></audio>
-  <script>
-    const directAudio = document.getElementById('bgMusic');
-    directAudio.play().catch(() => {});
-  </script>
 
-  <!-- เลเยอร์ลูกเล่นลอยไปมา -->
-  <div class="floating-container" id="floatingContainer"></div>
+  <!-- เลเยอร์ลูกเล่นลอย: ♡ 🍮 🪽 ☁️ และรูป PNG -->
+  <div class="floating-layer" id="floatingLayer"></div>
 
   <div class="container">
 
-    <!-- Profile Box -->
-    <div class="profile-card">
-      <div class="banner-container">
-        <img id="mainBanner" class="banner-img" src="https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif" alt="Banner">
+    <!-- แถบเมนูด้านบน[cite: 9, 10, 11, 12] -->
+    <div class="top-nav">
+      <div class="nav-tabs">
+        <button type="button" class="tab-btn active" onclick="switchNavTab('home')">Home</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('review')">Review</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('contact')">Contact</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('details')">Details</button>
+      </div>
+      <button type="button" class="music-btn" onclick="toggleAudio()">🎵</button>
+    </div>
+
+    <!-- 1. แท็บ HOME[cite: 9] -->
+    <div class="tab-content active" id="tab-home">
+      <div class="banner-card">
+        <img id="mainBanner" src="https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif" alt="Banner">
       </div>
 
       <div class="profile-wrap">
-        <img id="mainProfile" class="profile-img" src="https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg" alt="Profile">
-        <img id="discordFrameImg" class="discord-frame" src="https://i.ibb.co/nqR30Rcw/IMG-3563.png" alt="Discord Frame">
-      </div>
-
-      <h1 class="store-name" id="storeNameText">welcome to bebselris ♡</h1>
-      <p class="bio-text" id="storeBioText">welcome to luvselris
-ดูรีวิวกันก่อนได้นะคะ ตัวอย่างงานเว็บ งานป้าย คอนแทค</p>
-
-      <div>
-        <div class="music-bar" onclick="toggleMusic()">
-          <span id="musicText">pause music</span>
+        <div class="profile-img-wrap">
+          <img id="mainProfile" src="https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg" alt="Profile">
         </div>
       </div>
-    </div>
 
-    <!-- 4 ไฮไลท์สตอรี่ -->
-    <div class="highlights-scroll" id="highlightsBar"></div>
+      <h1 class="store-title" id="storeNameText">babyselris ♡</h1>
 
-    <!-- 4 แท็บเมนู -->
-    <div class="tabs-header">
-      <button class="tab-btn active" onclick="switchTab('home')">Home</button>
-      <button class="tab-btn" onclick="switchTab('review')">Review</button>
-      <button class="tab-btn" onclick="switchTab('details')">Details</button>
-      <button class="tab-btn" onclick="switchTab('contact')">Contact</button>
-    </div>
-
-    <!-- แท็บ 1: Home -->
-    <div class="tab-content active" id="tab-home">
-      <div class="section-card">
-        <div class="posts-grid" id="postsGrid">
-          <p style="text-align: center; grid-column: span 3; font-size: 12px; color: var(--palette-muted);">กำลังโหลดตัวอย่างงาน...</p>
-        </div>
+      <div class="bio-dashed-box" id="bioBoxText">
+Welcome to babyselris♡
+app premium ขายป้าย ทำเว็บไซต์
+♡ ส่งไว เปลี่ยนข้อมูลไว ส่งงานไวค้าบ
       </div>
+
+      <div class="review-header-label">
+        <span>🌸</span> <span>review babyselris</span>
+      </div>
+
+      <!-- ไฮไลท์ 4 อัน (ใส่รูปได้อินฟินิตี้)[cite: 9] -->
+      <div class="highlights-row" id="highlightsBar"></div>
     </div>
 
-    <!-- แท็บ 2: Review -->
+    <!-- 2. แท็บ REVIEW[cite: 10] -->
     <div class="tab-content" id="tab-review">
-      <div class="review-list" id="reviewList"></div>
+      <div class="review-form-card">
+        <div class="review-form-title">Review babyselris♡</div>
+        <input type="text" id="custNameInput" class="clean-input" placeholder="your name♡">
+        
+        <div class="stars-selector">
+          <button type="button" class="star-btn active" onclick="selectStar(1)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(2)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(3)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(4)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(5)">★</button>
+        </div>
+
+        <textarea id="custMsgInput" class="clean-textarea" placeholder="comment dailoey nakaa♡"></textarea>
+        <button type="button" class="pink-pill-btn" id="sendReviewBtn" onclick="submitReview()">sent review♡</button>
+      </div>
+
+      <div class="all-reviews-title">
+        <span>💬</span> <span>รีวิวทั้งหมด</span>
+      </div>
+
+      <div class="review-feed-list" id="feedbackFeed"></div>
     </div>
 
-    <!-- แท็บ 3: Details -->
+    <!-- 3. แท็บ CONTACT[cite: 11] -->
+    <div class="tab-content" id="tab-contact">
+      <div class="bio-dashed-box" style="margin-top:0;">
+        <div style="font-weight:600; color:var(--text-dark); margin-bottom:4px;">Contact me ♡</div>
+        ทักสอบถามคิวง่าย หรือสั่งซื้อทางช่องทางด้านล่างได้เลยนะคะ
+      </div>
+
+      <div class="contact-card-box" id="contactListWrap"></div>
+    </div>
+
+    <!-- 4. แท็บ DETAILS[cite: 12] -->
     <div class="tab-content" id="tab-details">
-      <div class="details-box">
-        <div class="details-text" id="detailsText">welcome to luvselris
-ตัวอย่างงานป้าย งานเว็บ และรายละเอียดการสั่งซื้อ</div>
-        <div class="thanks-card" id="thanksBoxText">
-          thank you for supporting bebselris ♡
+      <div class="details-white-card">
+        <div class="details-white-card-title">🎀 รายละเอียดร้านเจอร์รี่</div>
+        <div id="detailsContentText">
+• open-close : 09:00 - 22:00 น. (นอกเวลาทักทิ้งไว้ได้เลยค่ะ)
+• หากไม่ตอบ : ไม่ตอบเกิน 2 นาที สามารถทักซ้ำได้เลยค่ะ
+• การแก้ไขงาน : สามารถแก้ไขรายละเอียดเล็กน้อยได้ฟรี 2 ครั้ง
+• การชำระเงิน : รองรับพร้อมเพย์ ธนาคาร และทรูมันนี่วอลเล็ท
         </div>
       </div>
-    </div>
 
-    <!-- แท็บ 4: Contact -->
-    <div class="tab-content" id="tab-contact">
-      <div class="contact-list" id="contactList"></div>
-    </div>
-
-  </div>
-
-  <!-- Modal ดูงานขนาดจริง -->
-  <div class="modal-overlay" id="postModal">
-    <div class="modal-card">
-      <button type="button" class="modal-close" onclick="closeModal()">✕</button>
-      <div class="modal-img-wrap">
-        <img id="modalImg" src="" alt="Work Preview">
+      <div class="thanks-bubble" id="thanksBubbleText">
+        ขอบคุณที่มาอุดหนุนกันนะคะ ♡
       </div>
-      <div class="modal-desc" id="modalDesc">คำอธิบายงาน...</div>
-      <a id="modalLink" href="#" target="_blank" class="modal-link-btn">
-        เปิดดูลำดับงาน / ลิงก์ชิ้นงาน
-      </a>
     </div>
+
   </div>
 
   <!-- Story Fullscreen Viewer Modal -->
@@ -626,12 +671,12 @@
       <div class="story-user">
         <span id="storyTitleText">Highlight</span>
       </div>
-      <button class="story-close" onclick="closeStory()">✕</button>
+      <button class="story-close" onclick="closeStoryModal()">✕</button>
     </div>
     <div class="story-body">
-      <div class="story-nav-btn story-nav-left" onclick="prevStory()"></div>
-      <img id="storyActiveImg" src="" alt="Story Image">
-      <div class="story-nav-btn story-nav-right" onclick="nextStory()"></div>
+      <div class="story-nav-btn story-nav-left" onclick="prevStorySlide()"></div>
+      <img id="storyActiveImg" src="" alt="Story">
+      <div class="story-nav-btn story-nav-right" onclick="nextStorySlide()"></div>
     </div>
   </div>
 
@@ -648,241 +693,253 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let currentHighlights = [];
-    let activeHighlightIdx = 0;
-    let activeStoryImgIdx = 0;
-    let storyTimer = null;
+    let highlightsData = [];
+    let activeHlIdx = 0;
+    let activeSlideIdx = 0;
+    let slideTimer = null;
+    let currentRating = 5;
 
     const allowedEmojis = ['♡', '🍮', '🪽', '☁️'];
     let customFloatPng = 'https://i.ibb.co/tTxJ3Ykc/IMG-3650.png';
 
-    const music = document.getElementById('bgMusic');
-    const musicText = document.getElementById('musicText');
+    // เพลง Autoplay ทันที
+    const audio = document.getElementById('bgMusic');
+    audio.play().catch(() => {});
 
-    function toggleMusic() {
-      if (music.paused) {
-        music.play();
-        musicText.textContent = "pause music";
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
       } else {
-        music.pause();
-        musicText.textContent = "play music";
+        audio.pause();
       }
     }
 
-    // ดึงข้อมูล Realtime
-    db.collection("bebselris_pure_pink").doc("config").onSnapshot(doc => {
+    // สลับแท็บ 4 หัวข้อ[cite: 9, 10, 11, 12]
+    function switchNavTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // ดึงข้อมูล Realtime จาก babyselris_exact_site
+    db.collection("babyselris_exact_site").doc("config").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
         if (d.siteTitle) document.getElementById('pageTitle').textContent = d.siteTitle;
         if (d.storeName) document.getElementById('storeNameText').textContent = d.storeName;
-        if (d.storeBio) document.getElementById('storeBioText').textContent = d.storeBio;
+        if (d.storeBio) document.getElementById('bioBoxText').textContent = d.storeBio;
         if (d.bannerImg) document.getElementById('mainBanner').src = d.bannerImg;
         if (d.profileImg) document.getElementById('mainProfile').src = d.profileImg;
-        if (d.discordFrame) document.getElementById('discordFrameImg').src = d.discordFrame;
 
-        if (d.details) document.getElementById('detailsText').textContent = d.details;
-        if (d.thanksText) document.getElementById('thanksBoxText').textContent = d.thanksText;
+        if (d.details) document.getElementById('detailsContentText').textContent = d.details;
+        if (d.thanksText) document.getElementById('thanksBubbleText').textContent = d.thanksText;
 
         if (d.floatPng) customFloatPng = d.floatPng;
+
+        if (d.highlights && Array.isArray(d.highlights)) {
+          highlightsData = d.highlights;
+          renderHighlights(d.highlights);
+        }
 
         if (d.contacts && Array.isArray(d.contacts)) {
           renderContacts(d.contacts);
         }
 
-        if (d.highlights && Array.isArray(d.highlights)) {
-          currentHighlights = d.highlights;
-          renderHighlights(d.highlights);
-          renderReviewList(d.highlights);
-        }
-
-        if (d.musicUrl) {
-          if (music.src !== d.musicUrl) {
-            music.src = d.musicUrl;
-            music.play().catch(() => {});
-          }
+        if (d.musicUrl && audio.src !== d.musicUrl) {
+          audio.src = d.musicUrl;
+          audio.play().catch(() => {});
         }
       }
     });
 
-    // ดึงโพสต์งาน 3 ช่อง
-    db.collection("bebselris_pure_posts").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-      const grid = document.getElementById('postsGrid');
-      grid.innerHTML = '';
-      if (snapshot.empty) {
-        grid.innerHTML = '<p style="text-align:center; grid-column:span 3; font-size:12px; color:var(--palette-muted);">ยังไม่มีตัวอย่างงานค่ะ</p>';
-        return;
-      }
-      snapshot.forEach(doc => {
-        const item = { id: doc.id, ...doc.data() };
-        const slot = document.createElement('div');
-        slot.className = 'post-slot';
-        slot.onclick = () => openPostModal(item);
-        slot.innerHTML = `<img src="${item.imageUrl || ''}" alt="Post">`;
-        grid.appendChild(slot);
-      });
-    });
-
+    // แสดงผลไฮไลท์[cite: 9]
     function renderHighlights(hl) {
       const bar = document.getElementById('highlightsBar');
       bar.innerHTML = '';
       hl.forEach((item, idx) => {
         const cover = item.cover || (item.images && item.images[0]) || "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg";
         const div = document.createElement('div');
-        div.className = 'highlight-item';
+        div.className = 'hl-item';
         div.onclick = () => openStory(idx);
         div.innerHTML = `
-          <div class="highlight-ring"><img class="highlight-thumb" src="${cover}"></div>
-          <div class="highlight-name">${item.title || 'Review'}</div>
+          <div class="hl-ring"><img src="${cover}" alt="Hl"></div>
+          <div class="hl-label">${item.title || 'socute♡'}</div>
         `;
         bar.appendChild(div);
       });
     }
 
-    function renderReviewList(hl) {
-      const list = document.getElementById('reviewList');
-      list.innerHTML = '';
-      hl.forEach((item, idx) => {
-        const cover = item.cover || (item.images && item.images[0]) || "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg";
-        const count = item.images ? item.images.length : 0;
-        const div = document.createElement('div');
-        div.className = 'review-card-item';
-        div.onclick = () => openStory(idx);
-        div.innerHTML = `
-          <img src="${cover}">
-          <div class="review-info">
-            <div class="review-info-title">${item.title || 'Review'}</div>
-            <div class="review-info-sub">รวม ${count} รูปภาพ (แตะเพื่อเปิดดูแบบเต็มจอ)</div>
-          </div>
-          <span style="color: var(--palette-main); font-weight:700;">➔</span>
-        `;
-        list.appendChild(div);
-      });
-    }
-
+    // แสดงผลคอนแทค 3 ช่องทาง[cite: 11]
     function renderContacts(contacts) {
-      const box = document.getElementById('contactList');
+      const box = document.getElementById('contactListWrap');
       box.innerHTML = '';
       contacts.forEach(c => {
         if (!c.url) return;
         const a = document.createElement('a');
         a.href = c.url;
         a.target = '_blank';
-        a.className = 'contact-link-item';
-        a.innerHTML = `<span>${c.title}</span> <span style="color:var(--palette-main);">➔</span>`;
+        a.className = 'contact-bubble-link';
+        a.innerHTML = `
+          <div class="contact-bubble-left">
+            <div class="contact-circle-icon">${c.icon || '💬'}</div>
+            <div>
+              <div class="contact-info-title">${c.title}</div>
+              <div class="contact-info-sub">${c.sub || ''}</div>
+            </div>
+          </div>
+          <span style="color:#f2a7be; font-size:13px;">♡</span>
+        `;
         box.appendChild(a);
       });
     }
 
-    function openStory(idx) {
-      activeHighlightIdx = idx;
-      activeStoryImgIdx = 0;
-      const hl = currentHighlights[idx];
-      if (!hl || !hl.images || !hl.images.length) {
-        alert("ไฮไลท์นี้ยังไม่มีรูปภาพค่ะ");
+    // ส่งรีวิว[cite: 10]
+    function selectStar(num) {
+      currentRating = num;
+      const btns = document.querySelectorAll('.star-btn');
+      btns.forEach((btn, idx) => {
+        if (idx < num) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
+
+    async function submitReview() {
+      const name = document.getElementById('custNameInput').value.trim();
+      const msg = document.getElementById('custMsgInput').value.trim();
+      const btn = document.getElementById('sendReviewBtn');
+
+      if (!name || !msg) {
+        alert("กรุณากรอกชื่อและข้อความรีวิวด้วยนะคะ ♡");
         return;
       }
-      document.getElementById("storyTitleText").textContent = hl.title || 'Highlight';
+
+      btn.disabled = true;
+      btn.textContent = "sending...";
+
+      try {
+        await db.collection("babyselris_exact_reviews").add({
+          name: name,
+          msg: msg,
+          stars: currentRating,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('custNameInput').value = '';
+        document.getElementById('custMsgInput').value = '';
+        selectStar(5);
+        alert("ส่งรีวิวเรียบร้อยแล้วค่ะ ขอบคุณมากนะคะ ♡");
+      } catch (e) {
+        alert("เกิดข้อผิดพลาดในการส่งรีวิวค่ะ");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "sent review♡";
+      }
+    }
+
+    // แสดงรายการรีวิวสด[cite: 10]
+    db.collection("babyselris_exact_reviews").orderBy("createdAt", "desc").onSnapshot(snap => {
+      const feed = document.getElementById('feedbackFeed');
+      feed.innerHTML = '';
+      if (snap.empty) {
+        feed.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--text-muted); padding:10px;">ยังไม่มีรีวิว มารีวิวเป็นคนแรกได้เลยนะคะ ♡</p>';
+        return;
+      }
+      snap.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement('div');
+        div.className = 'review-bubble';
+        div.innerHTML = `
+          <div class="review-bubble-head">
+            <span class="review-cust-name">${d.name}</span>
+            <span class="review-stars-display">${'★'.repeat(d.stars || 5)}</span>
+          </div>
+          <div class="review-cust-msg">${d.msg}</div>
+        `;
+        feed.appendChild(div);
+      });
+    });
+
+    // Story Viewer อินฟินิตี้รูปภาพ
+    function openStory(idx) {
+      activeHlIdx = idx;
+      activeSlideIdx = 0;
+      const hl = highlightsData[idx];
+      if (!hl || !hl.images || !hl.images.length) {
+        alert("ไฮไลท์นี้ยังไม่มีรูปภาพค่ะ ♡");
+        return;
+      }
+      document.getElementById('storyTitleText').textContent = hl.title || 'Highlight';
       buildStoryBars();
-      showStoryImage();
-      document.getElementById("storyModal").classList.add("show");
+      showStorySlide();
+      document.getElementById('storyModal').classList.add('show');
     }
 
     function buildStoryBars() {
-      const hl = currentHighlights[activeHighlightIdx];
-      const bars = document.getElementById("storyBars");
-      bars.innerHTML = "";
+      const hl = highlightsData[activeHlIdx];
+      const bars = document.getElementById('storyBars');
+      bars.innerHTML = '';
       hl.images.forEach((_, i) => {
-        const bar = document.createElement("div");
-        bar.className = "story-bar";
-        bar.innerHTML = `<div class="story-bar-fill" id="sbar-${i}"></div>`;
+        const bar = document.createElement('div');
+        bar.className = 'story-bar';
+        bar.innerHTML = `<div class="story-bar-fill" id="sb-${i}"></div>`;
         bars.appendChild(bar);
       });
     }
 
-    function showStoryImage() {
-      clearTimeout(storyTimer);
-      const hl = currentHighlights[activeHighlightIdx];
-      const img = hl.images[activeStoryImgIdx];
-      document.getElementById("storyActiveImg").src = img;
+    function showStorySlide() {
+      clearTimeout(slideTimer);
+      const hl = highlightsData[activeHlIdx];
+      document.getElementById('storyActiveImg').src = hl.images[activeSlideIdx];
 
       hl.images.forEach((_, i) => {
-        const fill = document.getElementById(`sbar-${i}`);
+        const fill = document.getElementById(`sb-${i}`);
         if (!fill) return;
-        if (i < activeStoryImgIdx) {
-          fill.style.width = "100%";
-        } else if (i === activeStoryImgIdx) {
-          fill.style.width = "0%";
-          setTimeout(() => { fill.style.width = "100%"; }, 50);
-        } else {
-          fill.style.width = "0%";
-        }
+        if (i < activeSlideIdx) fill.style.width = '100%';
+        else if (i === activeSlideIdx) {
+          fill.style.width = '0%';
+          setTimeout(() => { fill.style.width = '100%'; }, 50);
+        } else fill.style.width = '0%';
       });
 
-      storyTimer = setTimeout(() => { nextStory(); }, 5000);
+      slideTimer = setTimeout(() => { nextStorySlide(); }, 5000);
     }
 
-    function nextStory() {
-      const hl = currentHighlights[activeHighlightIdx];
-      if (activeStoryImgIdx < hl.images.length - 1) {
-        activeStoryImgIdx++;
-        showStoryImage();
+    function nextStorySlide() {
+      const hl = highlightsData[activeHlIdx];
+      if (activeSlideIdx < hl.images.length - 1) {
+        activeSlideIdx++;
+        showStorySlide();
       } else {
-        closeStory();
+        closeStoryModal();
       }
     }
 
-    function prevStory() {
-      if (activeStoryImgIdx > 0) {
-        activeStoryImgIdx--;
-        showStoryImage();
+    function prevStorySlide() {
+      if (activeSlideIdx > 0) {
+        activeSlideIdx--;
+        showStorySlide();
       }
     }
 
-    function closeStory() {
-      clearTimeout(storyTimer);
-      document.getElementById("storyModal").classList.remove("show");
+    function closeStoryModal() {
+      clearTimeout(slideTimer);
+      document.getElementById('storyModal').classList.remove('show');
     }
 
-    function openPostModal(post) {
-      document.getElementById('modalImg').src = post.imageUrl || '';
-      document.getElementById('modalDesc').textContent = post.description || 'ไม่มีคำอธิบายเพิ่มเติมค่ะ ♡';
-      const linkBtn = document.getElementById('modalLink');
-      if (post.workUrl && post.workUrl.trim() !== '') {
-        linkBtn.href = post.workUrl;
-        linkBtn.style.display = 'flex';
-      } else {
-        linkBtn.style.display = 'none';
-      }
-      document.getElementById('postModal').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('postModal').classList.remove('active');
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      event.currentTarget.classList.add("active");
-      document.getElementById(`tab-${tabId}`).classList.add("active");
-    }
-
-    const floatBox = document.getElementById('floatingContainer');
-    function createFloatingAsset() {
+    // เลเยอร์ลูกเล่นลอย
+    const floatBox = document.getElementById('floatingLayer');
+    function createFloatItem() {
       const isPng = Math.random() > 0.5;
       const el = document.createElement(isPng ? 'img' : 'div');
       el.className = 'float-item ' + (isPng ? 'float-png' : 'float-emoji');
-      if (isPng) {
-        el.src = customFloatPng;
-      } else {
-        el.textContent = allowedEmojis[Math.floor(Math.random() * allowedEmojis.length)];
-      }
+      if (isPng) el.src = customFloatPng;
+      else el.textContent = allowedEmojis[Math.floor(Math.random() * allowedEmojis.length)];
       el.style.left = Math.random() * 90 + 'vw';
       el.style.animationDuration = (8 + Math.random() * 5) + 's';
       floatBox.appendChild(el);
-      setTimeout(() => { el.remove(); }, 14000);
+      setTimeout(() => el.remove(), 14000);
     }
-    setInterval(createFloatingAsset, 1400);
+    setInterval(createFloatItem, 1400);
   </script>
 </body>
 </html>
