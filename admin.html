@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard ♡ bebselris</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --palette-bg-top: #fff0f5;
+      --palette-bg-mid: #fce7f0;
+      --palette-card: #ffffff;
+      --palette-soft: #f5d3e4;
+      --palette-main: #f2a7be;
+      --palette-deep: #db7b97;
+      --palette-border: #f7d6e2;
+      --palette-text: #4e3d43;
+      --palette-muted: #947e85;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Quicksand', 'Mitr', sans-serif; }
+    body {
+      background: radial-gradient(circle at top, #ffffff 0%, var(--palette-bg-top) 45%, var(--palette-bg-mid) 100%);
+      color: var(--palette-text);
+      min-height: 100vh;
+      padding: 24px 16px 80px;
+      display: flex;
+      justify-content: center;
+    }
+    .container { width: 100%; max-width: 480px; }
+    
+    .card {
+      background: #ffffff; border-radius: 26px; padding: 22px 18px;
+      box-shadow: 0 10px 25px rgba(242, 167, 190, 0.2); border: 1.5px solid var(--palette-border); margin-bottom: 16px;
+    }
+    .title { font-size: 18px; font-weight: 700; color: var(--palette-deep); text-align: center; margin-bottom: 16px; }
+    .field-group { margin-bottom: 14px; }
+    .field-label { font-size: 13px; font-weight: 600; color: var(--palette-text); margin-bottom: 6px; display: block; }
+    .input-box, .textarea-box {
+      width: 100%; padding: 11px 14px; border-radius: 14px; border: 1.5px solid var(--palette-border);
+      outline: none; font-size: 13.5px; background: #fff; color: var(--palette-text); transition: all 0.2s;
+    }
+    .input-box:focus, .textarea-box:focus { border-color: var(--palette-main); }
+    .textarea-box { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+    .file-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px 14px; background: #fff5f8; border: 1.5px dashed var(--palette-main);
+      border-radius: 14px; color: var(--palette-deep); font-size: 12.5px; font-weight: 600;
+      cursor: pointer; width: 100%; margin-bottom: 6px;
+    }
+
+    .btn {
+      width: 100%; padding: 12px; border-radius: 18px; border: none; font-size: 14.5px; font-weight: 600;
+      cursor: pointer; background: linear-gradient(135deg, var(--palette-soft), var(--palette-main)); color: #fff; margin-top: 6px;
+      box-shadow: 0 6px 16px rgba(242, 167, 190, 0.35);
+    }
+    .btn-secondary { background: #fff; color: var(--palette-deep); border: 1.5px solid var(--palette-border); margin-top: 10px; box-shadow: none; }
+    .btn-add {
+      background: #fff5f8; color: var(--palette-deep); border: 1.5px dashed var(--palette-main);
+      font-size: 13px; padding: 10px; border-radius: 14px; margin-top: 8px; width: 100%; cursor: pointer; font-weight: 600;
+    }
+
+    /* Highlight Box */
+    .hl-edit-box {
+      background: #fffbfa; border: 1.5px solid var(--palette-border); border-radius: 18px;
+      padding: 14px; margin-bottom: 14px; position: relative;
+    }
+    .hl-header-bar {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    }
+    .hl-tag { font-size: 13px; font-weight: 700; color: var(--palette-deep); }
+    .hl-delete-btn {
+      background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5;
+      padding: 4px 10px; border-radius: 10px; font-size: 11.5px; font-weight: 600; cursor: pointer;
+    }
+    .hl-gallery {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;
+    }
+    .hl-img-wrap { position: relative; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; background: var(--palette-bg-mid); }
+    .hl-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .hl-img-del {
+      position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.85); color: #fff;
+      border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .post-item-card {
+      background: #fff; border: 1px solid var(--palette-border); border-radius: 14px; padding: 10px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .post-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: var(--palette-bg-mid); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ล็อกอิน -->
+  <div class="card" id="loginBox">
+    <div class="title">เข้าสู่ระบบแอดมิน</div>
+    <div class="field-group">
+      <label class="field-label">อีเมลแอดมิน</label>
+      <input type="email" id="loginEmail" class="input-box" placeholder="khurobutanoya@gmail.com">
+    </div>
+    <div class="field-group">
+      <label class="field-label">รหัสผ่าน</label>
+      <input type="password" id="loginPassword" class="input-box" placeholder="กรอกรหัสผ่าน">
+    </div>
+    <button type="button" class="btn" onclick="handleLogin()">เข้าสู่ระบบ</button>
+  </div>
+
+  <!-- แดชบอร์ดจัดการ -->
+  <div id="dashboardBox" class="hidden">
+    
+    <!-- 1. ข้อมูลส่วนตัว & โปรไฟล์ -->
+    <div class="card">
+      <div class="title">ข้อมูลโปรไฟล์และแบนเนอร์</div>
+      <div class="field-group">
+        <label class="field-label">ชื่อหัวเว็บ</label>
+        <input type="text" id="siteTitle" class="input-box">
+      </div>
+      <div class="field-group">
+        <label class="field-label">ชื่อร้าน / ชื่อหัวข้อ</label>
+        <input type="text" id="storeName" class="input-box">
+      </div>
+      <div class="field-group">
+        <label class="field-label">คำอธิบาย</label>
+        <textarea id="storeBio" class="textarea-box"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">แบนเนอร์ GIF</label>
+        <label class="file-btn">เลือกรูปหรือ GIF จากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectImage(event, 'bannerImg')"></label>
+        <input type="text" id="bannerImg" class="input-box" placeholder="หรือวางลิงก์รูป">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">รูปโปรไฟล์</label>
+        <label class="file-btn">เลือกรูปจากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectImage(event, 'profileImg')"></label>
+        <input type="text" id="profileImg" class="input-box" placeholder="หรือวางลิงก์รูป">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">กรอบโปรไฟล์สไตล์ Discord</label>
+        <label class="file-btn">เลือกรูปกรอบจากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectImage(event, 'discordFrame')"></label>
+        <input type="text" id="discordFrame" class="input-box" placeholder="หรือวางลิงก์กรอบ .png">
+      </div>
+    </div>
+
+    <!-- 2. จัดการ 4 ไฮไลท์สตอรี่ (อินฟินิตี้รูปภาพ) -->
+    <div class="card">
+      <div class="title">จัดการ 4 ไฮไลท์สตอรี่ (เพิ่มรูปได้ไม่จำกัด)</div>
+      <div id="highlightsManager"></div>
+      <button type="button" class="btn-add" onclick="addNewHighlight()">เพิ่มไฮไลท์ใหม่</button>
+    </div>
+
+    <!-- 3. เพิ่มโพสต์ผลงาน (แสดง 3 ช่องแบบ IG) -->
+    <div class="card">
+      <div class="title">เพิ่มโพสต์ตัวอย่างงานใหม่ (ขนาดจริง 100%)</div>
+      <div class="field-group">
+        <label class="field-label">รูปภาพงาน (ลิงก์ หรือ เลือกจากโทรศัพท์)</label>
+        <label class="file-btn">เลือกรูปงานจากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectPost(event)"></label>
+        <input type="text" id="newPostUrl" class="input-box" placeholder="หรือวางลิงก์รูปภาพ">
+      </div>
+      <div class="field-group">
+        <label class="field-label">คำอธิบายงาน (แสดงตอนกดเข้าไปดู)</label>
+        <textarea id="newPostDesc" class="textarea-box" rows="2" placeholder="รายละเอียดของงานชิ้นนี้..."></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">ลิงก์ผลงาน (ถ้ามีให้กดไปดูต่อ)</label>
+        <input type="url" id="newPostWorkUrl" class="input-box" placeholder="https://...">
+      </div>
+      <button type="button" class="btn" id="addPostBtn" onclick="submitNewPost()">+ เพิ่มโพสต์ลงเว็บ</button>
+
+      <hr style="border:none; border-top:1px dashed var(--palette-border); margin:18px 0;">
+      <div style="font-size:13.5px; font-weight:700; color:var(--palette-deep); margin-bottom:10px;">รายการโพสต์ทั้งหมดในเว็บ:</div>
+      <div id="postsListAdmin"></div>
+    </div>
+
+    <!-- 4. Details & คำขอบคุณ & Contact 3 ช่องทาง -->
+    <div class="card">
+      <div class="title">Details, คำขอบคุณ & Contact (3 ช่องทาง)</div>
+      <div class="field-group">
+        <label class="field-label">เนื้อหาหน้า Details</label>
+        <textarea id="detailsContent" class="textarea-box"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">ข้อความคำขอบคุณ (ช่อง Details)</label>
+        <input type="text" id="thanksText" class="input-box" placeholder="thank you for supporting bebselris ♡">
+      </div>
+
+      <hr style="border:none; border-top:1px dashed var(--palette-border); margin:16px 0;">
+
+      <div class="field-group">
+        <label class="field-label">ช่องทางติดต่อ 1 (เช่น LINE)</label>
+        <input type="text" id="contactTitle1" class="input-box" placeholder="ชื่อช่องทาง 1">
+        <input type="text" id="contactUrl1" class="input-box" style="margin-top:6px;" placeholder="URL ลิงก์ 1">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ช่องทางติดต่อ 2 (เช่น Google Drive / Portfolio)</label>
+        <input type="text" id="contactTitle2" class="input-box" placeholder="ชื่อช่องทาง 2">
+        <input type="text" id="contactUrl2" class="input-box" style="margin-top:6px;" placeholder="URL ลิงก์ 2">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">ช่องทางติดต่อ 3 (เช่น Instagram / อื่นๆ)</label>
+        <input type="text" id="contactTitle3" class="input-box" placeholder="ชื่อช่องทาง 3">
+        <input type="text" id="contactUrl3" class="input-box" style="margin-top:6px;" placeholder="URL ลิงก์ 3">
+      </div>
+    </div>
+
+    <!-- 5. เพลง & รูปลอย PNG -->
+    <div class="card">
+      <div class="title">เพลง & รูปลูกเล่น PNG ลอย</div>
+      <div class="field-group">
+        <label class="field-label">URL เพลง (.mp3)</label>
+        <input type="text" id="musicUrl" class="input-box">
+      </div>
+      <div class="field-group">
+        <label class="field-label">รูปลูกเล่น PNG ลอยไปมา</label>
+        <label class="file-btn">เลือกรูป PNG จากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectImage(event, 'floatPng')"></label>
+        <input type="text" id="floatPng" class="input-box" placeholder="URL รูป PNG">
+      </div>
+    </div>
+
+    <!-- 6. เปลี่ยนรหัสผ่านแอดมิน -->
+    <div class="card">
+      <div class="title">เปลี่ยนรหัสผ่านแอดมิน</div>
+      <div class="field-group">
+        <label class="field-label">รหัสผ่านใหม่</label>
+        <input type="password" id="newAdminPassword" class="input-box" placeholder="ปล่อยว่างหากไม่เปลี่ยน">
+      </div>
+    </div>
+
+    <button type="button" class="btn" id="saveBtn" onclick="saveAllConfig()">บันทึกขึ้นระบบทันที</button>
+    <button type="button" class="btn btn-secondary" onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpAGDSy1NRgmLV_g7qJrCpwOhU9MrfQyY",
+    authDomain: "benefitie.firebaseapp.com",
+    projectId: "benefitie",
+    storageBucket: "benefitie.firebasestorage.app",
+    messagingSenderId: "270365672215",
+    appId: "1:270365672215:web:230d1491091e26ce83ed52"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let currentAdminEmail = "khurobutanoya@gmail.com";
+  let currentAdminPass = "namkhang";
+
+  let highlightsData = [
+    { title: "Review 1", cover: "", images: [] },
+    { title: "Review 2", cover: "", images: [] },
+    { title: "Review 3", cover: "", images: [] },
+    { title: "Review 4", cover: "", images: [] }
+  ];
+
+  let tempNewPostImage = "";
+
+  db.collection("bebselris_pure_pink").doc("config").get().then(doc => {
+    if (doc.exists) {
+      const d = doc.data();
+      if (d.adminEmail) currentAdminEmail = d.adminEmail;
+      if (d.adminPass) currentAdminPass = d.adminPass;
+    }
+  });
+
+  function handleLogin() {
+    const e = document.getElementById("loginEmail").value.trim();
+    const p = document.getElementById("loginPassword").value.trim();
+    if (e === currentAdminEmail && p === currentAdminPass) {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("dashboardBox").classList.remove("hidden");
+      loadData();
+      listenPosts();
+    } else {
+      alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    }
+  }
+
+  function compressImage(file, maxDimension = 650, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadDirectImage(event, targetInputId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      const base64 = await compressImage(file, 650, 0.75);
+      document.getElementById(targetInputId).value = base64;
+    } catch (err) {
+      alert("แปลงรูปไม่ผ่าน");
+    }
+  }
+
+  function loadData() {
+    db.collection("bebselris_pure_pink").doc("config").get().then(doc => {
+      const d = doc.exists ? doc.data() : {};
+      document.getElementById("siteTitle").value = d.siteTitle || "welcome to bebselris ♡";
+      document.getElementById("storeName").value = d.storeName || "welcome to bebselris ♡";
+      document.getElementById("storeBio").value = d.storeBio || "welcome to luvselris\nดูรีวิวกันก่อนได้นะคะ ตัวอย่างงานเว็บ งานป้าย คอนแทค";
+      document.getElementById("bannerImg").value = d.bannerImg || "https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif";
+      document.getElementById("profileImg").value = d.profileImg || "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg";
+      document.getElementById("discordFrame").value = d.discordFrame || "https://i.ibb.co/nqR30Rcw/IMG-3563.png";
+
+      if (d.highlights && Array.isArray(d.highlights)) highlightsData = d.highlights;
+      renderHighlightManagers();
+
+      document.getElementById("detailsContent").value = d.details || "welcome to luvselris\nตัวอย่างงานป้าย งานเว็บ และรายละเอียดการสั่งซื้อ";
+      document.getElementById("thanksText").value = d.thanksText || "thank you for supporting bebselris ♡";
+
+      const c = d.contacts || [];
+      document.getElementById("contactTitle1").value = c[0] ? c[0].title : "Line : @861pblyp";
+      document.getElementById("contactUrl1").value = c[0] ? c[0].url : "https://lin.ee/OK18dvs";
+
+      document.getElementById("contactTitle2").value = c[1] ? c[1].title : "example เว็บ & ป้าย click";
+      document.getElementById("contactUrl2").value = c[1] ? c[1].url : "https://drive.google.com/drive/folders/1VPUYkyqywBZgPIOjGnPbY2OpQn7BJwdq";
+
+      document.getElementById("contactTitle3").value = c[2] ? c[2].title : "review click";
+      document.getElementById("contactUrl3").value = c[2] ? c[2].url : "https://luvselris.web.app/#review";
+
+      document.getElementById("musicUrl").value = d.musicUrl || "https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3";
+      document.getElementById("floatPng").value = d.floatPng || "https://i.ibb.co/tTxJ3Ykc/IMG-3650.png";
+    });
+  }
+
+  function renderHighlightManagers() {
+    const box = document.getElementById("highlightsManager");
+    box.innerHTML = "";
+    highlightsData.forEach((hl, idx) => {
+      const wrap = document.createElement("div");
+      wrap.className = "hl-edit-box";
+      wrap.innerHTML = `
+        <div class="hl-header-bar">
+          <span class="hl-tag">ไฮไลท์สตอรี่ที่ ${idx+1}</span>
+          <button type="button" class="hl-delete-btn" onclick="deleteEntireHighlight(${idx})">ลบไฮไลท์นี้</button>
+        </div>
+        <div class="field-group">
+          <label class="field-label">ชื่อไฮไลท์</label>
+          <input type="text" class="input-box" value="${hl.title || ''}" oninput="highlightsData[${idx}].title = this.value">
+        </div>
+        <div class="field-group">
+          <label class="field-label">รูปหน้าปกไฮไลท์ (ลิงก์/อัปโหลด)</label>
+          <input type="text" class="input-box" id="hl-cover-${idx}" value="${hl.cover || ''}" placeholder="URL หน้าปก" oninput="highlightsData[${idx}].cover = this.value">
+        </div>
+        <label class="file-btn">
+          ➕ อัปโหลดรูปเพิ่มเข้าสตอรี่นี้ (จากโทรศัพท์)
+          <input type="file" accept="image/*" multiple style="display:none;" onchange="uploadStoryImages(event, ${idx})">
+        </label>
+        <div style="font-size:12px; color:var(--palette-muted); margin-top:4px;">มี ${hl.images ? hl.images.length : 0} ภาพ (อินฟินิตี้รูปภาพ)</div>
+        <div class="hl-gallery" id="hl-gal-${idx}"></div>
+      `;
+      box.appendChild(wrap);
+
+      const gal = wrap.querySelector(`#hl-gal-${idx}`);
+      if (hl.images) {
+        hl.images.forEach((imgUrl, imgIdx) => {
+          const item = document.createElement("div");
+          item.className = "hl-img-wrap";
+          item.innerHTML = `
+            <img src="${imgUrl}">
+            <button type="button" class="hl-img-del" onclick="removeStoryImage(${idx}, ${imgIdx})">×</button>
+          `;
+          gal.appendChild(item);
+        });
+      }
+    });
+  }
+
+  function deleteEntireHighlight(index) {
+    if (confirm(`ต้องการลบไฮไลท์ "${highlightsData[index].title || 'รีวิว'}" นี้ใช่ไหมคะ?`)) {
+      highlightsData.splice(index, 1);
+      renderHighlightManagers();
+    }
+  }
+
+  function addNewHighlight() {
+    highlightsData.push({
+      title: `Review ${highlightsData.length + 1}`,
+      cover: "",
+      images: []
+    });
+    renderHighlightManagers();
+  }
+
+  async function uploadStoryImages(event, hlIndex) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+    if (!highlightsData[hlIndex].images) highlightsData[hlIndex].images = [];
+    
+    for (const file of files) {
+      try {
+        const base64 = await compressImage(file, 500, 0.7);
+        highlightsData[hlIndex].images.push(base64);
+      } catch (err) {
+        console.error("บีบอัดรูปไม่ผ่าน", err);
+      }
+    }
+    renderHighlightManagers();
+  }
+
+  function removeStoryImage(hlIndex, imgIndex) {
+    highlightsData[hlIndex].images.splice(imgIndex, 1);
+    renderHighlightManagers();
+  }
+
+  async function uploadDirectPost(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      tempNewPostImage = await compressImage(file, 1000, 0.85);
+      document.getElementById('newPostUrl').value = '';
+    } catch (e) {
+      alert("แปลงรูปไม่ผ่าน");
+    }
+  }
+
+  async function submitNewPost() {
+    const url = document.getElementById('newPostUrl').value.trim();
+    const desc = document.getElementById('newPostDesc').value.trim();
+    const workUrl = document.getElementById('newPostWorkUrl').value.trim();
+    const btn = document.getElementById('addPostBtn');
+
+    const finalImage = url || tempNewPostImage;
+    if (!finalImage) {
+      alert("กรุณาใส่ลิงก์รูป หรือเลือกไฟล์รูปภาพก่อนนะคะ");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "กำลังเพิ่มโพสต์...";
+
+    try {
+      await db.collection("bebselris_pure_posts").add({
+        imageUrl: finalImage,
+        description: desc,
+        workUrl: workUrl,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      document.getElementById('newPostUrl').value = '';
+      document.getElementById('newPostDesc').value = '';
+      document.getElementById('newPostWorkUrl').value = '';
+      tempNewPostImage = '';
+      alert("เพิ่มโพสต์ลงเว็บเรียบร้อยแล้วค่ะ");
+    } catch (e) {
+      alert("เกิดข้อผิดพลาดในการเพิ่มโพสต์");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "+ เพิ่มโพสต์ลงเว็บ";
+    }
+  }
+
+  function listenPosts() {
+    db.collection("bebselris_pure_posts").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+      const list = document.getElementById('postsListAdmin');
+      list.innerHTML = '';
+      if (snapshot.empty) {
+        list.innerHTML = '<p style="font-size:12px; color:var(--palette-muted);">ยังไม่มีโพสต์ในระบบ</p>';
+        return;
+      }
+      snapshot.forEach(doc => {
+        const item = doc.data();
+        const div = document.createElement('div');
+        div.className = 'post-item-card';
+        div.innerHTML = `
+          <img src="${item.imageUrl}" class="post-thumb">
+          <div style="flex:1; overflow:hidden;">
+            <div style="font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${item.description || '(ไม่มีคำอธิบาย)'}
+            </div>
+          </div>
+          <button type="button" class="hl-delete-btn" onclick="deletePost('${doc.id}')">ลบ</button>
+        `;
+        list.appendChild(div);
+      });
+    });
+  }
+
+  async function deletePost(id) {
+    if (confirm("ต้องการลบโพสต์นี้ใช่ไหมคะ?")) {
+      await db.collection("bebselris_pure_posts").doc(id).delete();
+    }
+  }
+
+  async function saveAllConfig() {
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.textContent = "กำลังบันทึกข้อมูล...";
+
+    const payload = {
+      siteTitle: document.getElementById("siteTitle").value.trim(),
+      storeName: document.getElementById("storeName").value.trim(),
+      storeBio: document.getElementById("storeBio").value.trim(),
+      bannerImg: document.getElementById("bannerImg").value.trim(),
+      profileImg: document.getElementById("profileImg").value.trim(),
+      discordFrame: document.getElementById("discordFrame").value.trim(),
+
+      highlights: highlightsData,
+
+      details: document.getElementById("detailsContent").value.trim(),
+      thanksText: document.getElementById("thanksText").value.trim(),
+
+      contacts: [
+        { title: document.getElementById("contactTitle1").value.trim(), url: document.getElementById("contactUrl1").value.trim() },
+        { title: document.getElementById("contactTitle2").value.trim(), url: document.getElementById("contactUrl2").value.trim() },
+        { title: document.getElementById("contactTitle3").value.trim(), url: document.getElementById("contactUrl3").value.trim() }
+      ],
+
+      musicUrl: document.getElementById("musicUrl").value.trim(),
+      floatPng: document.getElementById("floatPng").value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    const newPass = document.getElementById("newAdminPassword").value.trim();
+    if (newPass) {
+      payload.adminPass = newPass;
+      currentAdminPass = newPass;
+    }
+
+    try {
+      await db.collection("bebselris_pure_pink").doc("config").set(payload, { merge: true });
+      alert("บันทึกข้อมูลทั้งหมดสำเร็จแล้วค่ะ หน้าเว็บเปลี่ยนทันที");
+      document.getElementById("newAdminPassword").value = "";
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "บันทึกขึ้นระบบทันที";
+    }
+  }
+
+  function logout() {
+    document.getElementById("dashboardBox").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
+  }
+</script>
+</body>
+</html>
