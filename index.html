@@ -8,13 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK (bebselris_pure_pink แยกขาด 100%) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
-      /* โทนสีตามภาพ Color Palette ที่ส่งมาเป๊ะๆ */
       --palette-bg-top: #fff0f5;
       --palette-bg-mid: #fce7f0;
       --palette-bg-bot: #fadbe7;
@@ -44,7 +43,7 @@
       position: relative;
     }
 
-    /* เลเยอร์ลูกเล่นลอย: ♡ 🍮 🪽 ☁️ และรูปภาพ PNG */
+    /* เลเยอร์ลูกเล่นลอย */
     .floating-container {
       position: fixed;
       top: 0;
@@ -229,7 +228,7 @@
       font-weight: 600;
     }
 
-    /* 4 แท็บเมนู: Home Review Details Contact */
+    /* 4 แท็บเมนู */
     .tabs-header {
       display: flex;
       border-top: 1.5px solid var(--palette-border);
@@ -262,7 +261,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* แท็บ 1: Home (ตารางโพสต์ 3 ช่องแบบ IG) */
+    /* แท็บ 1: Home */
     .section-card {
       background: var(--palette-card);
       backdrop-filter: blur(14px);
@@ -297,7 +296,7 @@
     }
     .post-slot:active img { transform: scale(0.96); }
 
-    /* แท็บ 2: Review (รวมไฮไลท์รีวิวแบบ Infinity) */
+    /* แท็บ 2: Review */
     .review-list {
       display: flex;
       flex-direction: column;
@@ -325,7 +324,7 @@
     .review-info-title { font-size: 14px; font-weight: 700; color: var(--palette-text); }
     .review-info-sub { font-size: 12px; color: var(--palette-muted); margin-top: 2px; }
 
-    /* แท็บ 3: Details (มีรายละเอียด & คำขอบคุณ) */
+    /* แท็บ 3: Details */
     .details-box {
       background: var(--palette-card);
       border: 2px solid #ffffff;
@@ -351,7 +350,7 @@
       color: var(--palette-deep);
     }
 
-    /* แท็บ 4: Contact (3 ช่องทาง) */
+    /* แท็บ 4: Contact */
     .contact-list {
       display: flex;
       flex-direction: column;
@@ -374,7 +373,7 @@
     }
     .contact-link-item:active { transform: scale(0.97); }
 
-    /* Modal Popup ดูงาน: แสดงรูปตามขนาดจริง 100% ไม่บีบรูป */
+    /* Modal Popup */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -529,10 +528,14 @@
 </head>
 <body>
 
-  <!-- เพลงเล่นทันที autoplay playsinline -->
+  <!-- เพลงเล่นทันทีระดับ Native สั่งเริ่มทันทีไม่ต้องรอการกดใดๆ -->
   <audio id="bgMusic" loop autoplay playsinline preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3"></audio>
+  <script>
+    const directAudio = document.getElementById('bgMusic');
+    directAudio.play().catch(() => {});
+  </script>
 
-  <!-- เลเยอร์ลูกเล่นลอย: เฉพาะ ♡ 🍮 🪽 ☁️ และรูป PNG -->
+  <!-- เลเยอร์ลูกเล่นลอยไปมา -->
   <div class="floating-container" id="floatingContainer"></div>
 
   <div class="container">
@@ -570,7 +573,7 @@
       <button class="tab-btn" onclick="switchTab('contact')">Contact</button>
     </div>
 
-    <!-- แท็บ 1: Home (ตารางโพสต์ 3 ช่อง) -->
+    <!-- แท็บ 1: Home -->
     <div class="tab-content active" id="tab-home">
       <div class="section-card">
         <div class="posts-grid" id="postsGrid">
@@ -653,15 +656,8 @@
     const allowedEmojis = ['♡', '🍮', '🪽', '☁️'];
     let customFloatPng = 'https://i.ibb.co/tTxJ3Ykc/IMG-3650.png';
 
-    // เล่นเพลงทันที
     const music = document.getElementById('bgMusic');
     const musicText = document.getElementById('musicText');
-
-    music.play().then(() => {
-      musicText.textContent = "pause music";
-    }).catch(() => {
-      musicText.textContent = "play music";
-    });
 
     function toggleMusic() {
       if (music.paused) {
@@ -871,7 +867,6 @@
       document.getElementById(`tab-${tabId}`).classList.add("active");
     }
 
-    // เลเยอร์ลอย: สลับสุ่มระหว่าง ♡ 🍮 🪽 ☁️ และรูป PNG
     const floatBox = document.getElementById('floatingContainer');
     function createFloatingAsset() {
       const isPng = Math.random() > 0.5;
