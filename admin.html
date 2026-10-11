@@ -39,7 +39,7 @@
       display: flex;
       justify-content: center;
     }
-    .container { width: 100%; max-width: 460px; }f
+    .container { width: 100%; max-width: 460px; }
     
     .card {
       background: #ffffff;
@@ -239,9 +239,9 @@
       </div>
     </div>
 
-    <!-- 2. จัดการ 4 ไฮไลท์สตอรี่ (อัปโหลดรูปได้อินฟินิตี้) -->
+    <!-- 2. จัดการ 4 ไฮไลท์สตอรี่ -->
     <div class="card">
-      <div class="title">จัดการ 4 ไฮไลท์สตอรี่ (รูปภาพไม่จำกัด)</div>
+      <div class="title">จัดการ 4 ไฮไลท์สตอรี่</div>
       <div id="highlightsManager"></div>
       <button type="button" class="btn" style="background:#fff; color:var(--pink-deep); border:1.5px dashed var(--pink-main);" onclick="addNewHighlight()">+ เพิ่มไฮไลท์ใหม่</button>
     </div>
@@ -299,7 +299,7 @@
       </div>
       <div class="field-group">
         <label class="field-label">รูปลูกเล่น PNG ลอยไปมา</label>
-        <label class="file-btn">📁 เลือกรูป PNG จากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirect(event, 'floatPng')"></label>
+        <label class="file-btn">📁 เลือกรูป PNG จากโทรศัพท์ <input type="file" accept="image/*" style="display:none;" onchange="uploadDirect(event, 'floatPng', true)"></label>
         <input type="text" id="floatPng" class="input-box">
       </div>
     </div>
@@ -362,8 +362,8 @@
     }
   }
 
-  // ฟังก์ชันย่อขนาดภาพเพื่อไม่ให้เกินขีดจำกัดเอกสารของ Firestore
-  function compressImg(file, maxDimension = 650, quality = 0.75) {
+  // ปรับการบีบอัดให้ไม่เปลืองพื้นที่ Firestore (เพดาน 1 MB)
+  function compressImg(file, maxDimension = 640, quality = 0.65, isPng = false) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -378,7 +378,7 @@
           canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL("image/jpeg", quality));
+          resolve(canvas.toDataURL(isPng ? "image/png" : "image/jpeg", quality));
         };
         img.onerror = reject;
         img.src = e.target.result;
@@ -388,14 +388,14 @@
     });
   }
 
-  async function uploadDirect(event, targetId) {
+  async function uploadDirect(event, targetId, isPng = false) {
     const file = event.target.files[0];
     if (!file) return;
     try {
-      const b64 = await compressImg(file, 1200, 0.92);
+      const b64 = await compressImg(file, isPng ? 320 : 640, isPng ? 0.7 : 0.65, isPng);
       document.getElementById(targetId).value = b64;
     } catch (e) {
-      alert("แปลงรูปไม่ผ่าน");
+      alert("แปลงรูปไม่ผ่าน ลองเลือกใหม่อีกครั้งนะคะ");
     }
   }
 
@@ -457,7 +457,7 @@
           ➕ อัปโหลดรูปเพิ่มเข้าสตอรี่นี้ (จากโทรศัพท์)
           <input type="file" accept="image/*" multiple style="display:none;" onchange="uploadStoryImages(event, ${idx})">
         </label>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">มี ${hl.images ? hl.images.length : 0} ภาพ (ใส่ได้ไม่จำกัด)</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">มี ${hl.images ? hl.images.length : 0} ภาพ</div>
         <div class="hl-gallery" id="hl-gal-${idx}"></div>
       `;
       box.appendChild(wrap);
@@ -500,7 +500,8 @@
     
     for (const f of files) {
       try {
-        const b64 = await compressImg(f, 1200, 0.92);
+        // ย่อรูปในสตอรี่ให้อยู่ในไซส์พอดีมือถือ (640px, คุณภาพ 0.65)
+        const b64 = await compressImg(f, 640, 0.65);
         highlightsData[hlIdx].images.push(b64);
       } catch (err) {}
     }
@@ -574,6 +575,16 @@
     if (newPass) {
       payload.adminPass = newPass;
       currentAdminPass = newPass;
+    }
+
+    // ตรวจสอบขนาด JSON ก่อนส่งขึ้น Firebase
+    const jsonStr = JSON.stringify(payload);
+    const sizeInBytes = new Blob([jsonStr]).size;
+    if (sizeInBytes > 950000) {
+      alert(`⚠️ ขนาดข้อมูลรวม (${(sizeInBytes / 1024 / 1024).toFixed(2)} MB) ใกล้เกิน 1 MB!\nแนะนำให้ลบรูปในสตอรี่บางส่วนออก หรือใช้ลิงก์รูป (URL) แทนการอัปโหลดไฟล์สดนะคะ`);
+      btn.disabled = false;
+      btn.textContent = "บันทึกขึ้นระบบทันที ♡";
+      return;
     }
 
     try {
