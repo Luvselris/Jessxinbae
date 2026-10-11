@@ -800,6 +800,7 @@
       document.getElementById(`tab-${tabId}`).classList.add('active');
     }
 
+    // 1. ดึงข้อมูล Config ทั่วไป
     db.collection("babyselris_exact_site").doc("config").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
@@ -813,19 +814,28 @@
 
         if (d.floatPng) customFloatPng = d.floatPng;
 
-        if (d.highlights && Array.isArray(d.highlights) && d.highlights.length) {
-          highlightsData = d.highlights;
-          renderHighlights(d.highlights);
-        }
-
         if (d.musicUrl && audio.src !== d.musicUrl) {
           audio.src = d.musicUrl;
           unlockAndPlayAudio();
         }
-      } else {
-        renderHighlights(highlightsData);
       }
     });
+
+    // 2. ดึงไฮไลท์แบบ Sub-collection (ภาพชัด HD ไม่จำกัด พร้อม Fallback)
+    db.collection("babyselris_exact_site").doc("config")
+      .collection("highlights_list").orderBy("order", "asc").onSnapshot(snap => {
+        if (!snap.empty) {
+          highlightsData = snap.docs.map(doc => doc.data());
+          renderHighlights(highlightsData);
+        } else {
+          db.collection("babyselris_exact_site").doc("config").get().then(doc => {
+            if (doc.exists && doc.data().highlights && doc.data().highlights.length) {
+              highlightsData = doc.data().highlights;
+            }
+            renderHighlights(highlightsData);
+          });
+        }
+      });
 
     function renderHighlights(hl) {
       const bar = document.getElementById('highlightsBar');
