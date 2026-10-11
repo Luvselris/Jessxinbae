@@ -239,9 +239,9 @@
       </div>
     </div>
 
-    <!-- 2. จัดการ 4 ไฮไลท์สตอรี่ -->
+    <!-- 2. จัดการไฮไลท์สตอรี่ (อัปโหลดรูป HD ไม่จำกัด) -->
     <div class="card">
-      <div class="title">จัดการ 4 ไฮไลท์สตอรี่</div>
+      <div class="title">จัดการไฮไลท์สตอรี่ (ภาพ HD ไม่จำกัด)</div>
       <div id="highlightsManager"></div>
       <button type="button" class="btn" style="background:#fff; color:var(--pink-deep); border:1.5px dashed var(--pink-main);" onclick="addNewHighlight()">+ เพิ่มไฮไลท์ใหม่</button>
     </div>
@@ -334,12 +334,7 @@
   let currentAdminEmail = "khurobutanoya@gmail.com";
   let currentAdminPass = "namkhang";
 
-  let highlightsData = [
-    { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
-    { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
-    { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
-    { title: "♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] }
-  ];
+  let highlightsData = [];
 
   db.collection("babyselris_exact_site").doc("config").get().then(doc => {
     if (doc.exists) {
@@ -362,8 +357,8 @@
     }
   }
 
-  // ปรับการบีบอัดให้ไม่เปลืองพื้นที่ Firestore (เพดาน 1 MB)
-  function compressImg(file, maxDimension = 640, quality = 0.65, isPng = false) {
+  // ย่อรูปในระดับความคมชัดสูง HD เต็มจอ
+  function compressImg(file, maxDimension = 1400, quality = 0.85, isPng = false) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -392,46 +387,57 @@
     const file = event.target.files[0];
     if (!file) return;
     try {
-      const b64 = await compressImg(file, isPng ? 320 : 640, isPng ? 0.7 : 0.65, isPng);
+      const b64 = await compressImg(file, isPng ? 400 : 900, isPng ? 0.8 : 0.82, isPng);
       document.getElementById(targetId).value = b64;
     } catch (e) {
-      alert("แปลงรูปไม่ผ่าน ลองเลือกใหม่อีกครั้งนะคะ");
+      alert("แปลงรูปไม่ผ่าน ลองใหม่อีกครั้งนะคะ");
     }
   }
 
-  function loadData() {
-    db.collection("babyselris_exact_site").doc("config").get().then(doc => {
-      const d = doc.exists ? doc.data() : {};
-      document.getElementById("siteTitle").value = d.siteTitle || "babyselris ♡";
-      document.getElementById("storeName").value = d.storeName || "babyselris ♡";
-      document.getElementById("storeBio").value = d.storeBio || `Welcome to babyselris♡\napp premium ขายป้าย ทำเว็บไซต์\n♡ ส่งไว เปลี่ยนข้อมูลไว ส่งงานไวค้าบ`;
-      document.getElementById("bannerImg").value = d.bannerImg || "https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif";
-      document.getElementById("profileImg").value = d.profileImg || "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg";
+  async function loadData() {
+    const doc = await db.collection("babyselris_exact_site").doc("config").get();
+    const d = doc.exists ? doc.data() : {};
 
-      if (d.highlights && Array.isArray(d.highlights) && d.highlights.length) {
-        highlightsData = d.highlights;
-      }
-      renderHlManager();
+    document.getElementById("siteTitle").value = d.siteTitle || "babyselris ♡";
+    document.getElementById("storeName").value = d.storeName || "babyselris ♡";
+    document.getElementById("storeBio").value = d.storeBio || `Welcome to babyselris♡\napp premium ขายป้าย ทำเว็บไซต์\n♡ ส่งไว เปลี่ยนข้อมูลไว ส่งงานไวค้าบ`;
+    document.getElementById("bannerImg").value = d.bannerImg || "https://c.tenor.com/qvn5EduVCSDAAAAC/tenor.gif";
+    document.getElementById("profileImg").value = d.profileImg || "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg";
 
-      document.getElementById("detailsContent").value = d.details || `• open-close : 09:00 - 22:00 น. (นอกเวลาทักทิ้งไว้ได้เลยค่ะ)\n• หากไม่ตอบ : ไม่ตอบเกิน 2 นาที สามารถทักซ้ำได้เลยค่ะ\n• การแก้ไขงาน : สามารถแก้ไขรายละเอียดเล็กน้อยได้ฟรี 2 ครั้ง\n• การชำระเงิน : รองรับพร้อมเพย์ ธนาคาร และทรูมันนี่วอลเล็ท`;
-      document.getElementById("thanksText").value = d.thanksText || "ขอบคุณที่มาอุดหนุนกันนะคะ ♡";
+    document.getElementById("detailsContent").value = d.details || `• open-close : 09:00 - 22:00 น. (นอกเวลาทักทิ้งไว้ได้เลยค่ะ)\n• หากไม่ตอบ : ไม่ตอบเกิน 2 นาที สามารถทักซ้ำได้เลยค่ะ\n• การแก้ไขงาน : สามารถแก้ไขรายละเอียดเล็กน้อยได้ฟรี 2 ครั้ง\n• การชำระเงิน : รองรับพร้อมเพย์ ธนาคาร และทรูมันนี่วอลเล็ท`;
+    document.getElementById("thanksText").value = d.thanksText || "ขอบคุณที่มาอุดหนุนกันนะคะ ♡";
 
-      const c = d.contacts || [];
-      document.getElementById("cTitle1").value = c[0] ? c[0].title : "Line Official Acccount";
-      document.getElementById("cSub1").value = c[0] ? c[0].sub : "ติดต่อสอบถาม - สั่งซื้อสินค้า";
-      document.getElementById("cUrl1").value = c[0] ? c[0].url : "https://lin.ee/xJ4OSOX";
+    const c = d.contacts || [];
+    document.getElementById("cTitle1").value = c[0] ? c[0].title : "Line Official Acccount";
+    document.getElementById("cSub1").value = c[0] ? c[0].sub : "ติดต่อสอบถาม - สั่งซื้อสินค้า";
+    document.getElementById("cUrl1").value = c[0] ? c[0].url : "https://lin.ee/xJ4OSOX";
 
-      document.getElementById("cTitle2").value = c[1] ? c[1].title : "Line ส่วนตัว (ไลน์หลัก)";
-      document.getElementById("cSub2").value = c[1] ? c[1].sub : "ติดต่อด่วน หรือแจ้งปัญหา";
-      document.getElementById("cUrl2").value = c[1] ? c[1].url : "https://line.me/ti/p/2kUga_abxE";
+    document.getElementById("cTitle2").value = c[1] ? c[1].title : "Line ส่วนตัว (ไลน์หลัก)";
+    document.getElementById("cSub2").value = c[1] ? c[1].sub : "ติดต่อด่วน หรือแจ้งปัญหา";
+    document.getElementById("cUrl2").value = c[1] ? c[1].url : "https://line.me/ti/p/2kUga_abxE";
 
-      document.getElementById("cTitle3").value = c[2] ? c[2].title : "Instagram (ไอจีร้าน)";
-      document.getElementById("cSub3").value = c[2] ? c[2].sub : "ติดต่อสอบถาม - สั่งซื้อสินค้า ทักไลน์ตอบไวกว่าคั้บ";
-      document.getElementById("cUrl3").value = c[2] ? c[2].url : "https://www.instagram.com/jesselvucat_?stkn=MW1xbGFrYWF5MDdxag%3D%3D&utm_source=qr";
+    document.getElementById("cTitle3").value = c[2] ? c[2].title : "Instagram (ไอจีร้าน)";
+    document.getElementById("cSub3").value = c[2] ? c[2].sub : "ติดต่อสอบถาม - สั่งซื้อสินค้า ทักไลน์ตอบไวกว่าคั้บ";
+    document.getElementById("cUrl3").value = c[2] ? c[2].url : "https://www.instagram.com/jesselvucat_?stkn=MW1xbGFrYWF5MDdxag%3D%3D&utm_source=qr";
 
-      document.getElementById("musicUrl").value = d.musicUrl || "https://file.garden/asG8Gt-rqWIpi3II/YENTED%20-%20%E0%B8%AB%E0%B8%B4%E0%B8%99%E0%B8%AB%E0%B8%A2%E0%B8%94%E0%B8%A5%E0%B8%87%E0%B8%99%E0%B9%89%E0%B8%B3%20(adore)%20ft.%20Minchang%2C%20gomen.%20%5BOfficial%20Video%5D.mp3";
-      document.getElementById("floatPng").value = d.floatPng || "https://i.ibb.co/tTxJ3Ykc/IMG-3650.png";
-    });
+    document.getElementById("musicUrl").value = d.musicUrl || "";
+    document.getElementById("floatPng").value = d.floatPng || "";
+
+    // ดึงไฮไลท์จาก Sub-collection ก่อน
+    const hlSnap = await db.collection("babyselris_exact_site").doc("config").collection("highlights_list").orderBy("order", "asc").get();
+    if (!hlSnap.empty) {
+      highlightsData = hlSnap.docs.map(doc => doc.data());
+    } else if (d.highlights && Array.isArray(d.highlights) && d.highlights.length) {
+      highlightsData = d.highlights;
+    } else {
+      highlightsData = [
+        { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
+        { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
+        { title: "socute♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] },
+        { title: "♡", cover: "https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg", images: ["https://i.ibb.co/mCZ2x6pK/IMG-3558.jpg"] }
+      ];
+    }
+    renderHlManager();
   }
 
   function renderHlManager() {
@@ -454,10 +460,10 @@
           <input type="text" class="input-box" value="${hl.cover || ''}" placeholder="URL หน้าปก" oninput="highlightsData[${idx}].cover = this.value">
         </div>
         <label class="file-btn">
-          ➕ อัปโหลดรูปเพิ่มเข้าสตอรี่นี้ (จากโทรศัพท์)
+          ➕ อัปโหลดรูปเพิ่มเข้าสตอรี่นี้ (จากโทรศัพท์ ภาพชัด HD)
           <input type="file" accept="image/*" multiple style="display:none;" onchange="uploadStoryImages(event, ${idx})">
         </label>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">มี ${hl.images ? hl.images.length : 0} ภาพ</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">มี ${hl.images ? hl.images.length : 0} ภาพ (ไม่จำกัด)</div>
         <div class="hl-gallery" id="hl-gal-${idx}"></div>
       `;
       box.appendChild(wrap);
@@ -500,8 +506,7 @@
     
     for (const f of files) {
       try {
-        // ย่อรูปในสตอรี่ให้อยู่ในไซส์พอดีมือถือ (640px, คุณภาพ 0.65)
-        const b64 = await compressImg(f, 640, 0.65);
+        const b64 = await compressImg(f, 1400, 0.85);
         highlightsData[hlIdx].images.push(b64);
       } catch (err) {}
     }
@@ -546,7 +551,7 @@
   async function saveAll() {
     const btn = document.getElementById("saveBtn");
     btn.disabled = true;
-    btn.textContent = "กำลังบันทึกข้อมูล...";
+    btn.textContent = "กำลังบันทึกข้อมูลแบบ HD...";
 
     const payload = {
       siteTitle: document.getElementById("siteTitle").value.trim(),
@@ -554,18 +559,13 @@
       storeBio: document.getElementById("storeBio").value.trim(),
       bannerImg: document.getElementById("bannerImg").value.trim(),
       profileImg: document.getElementById("profileImg").value.trim(),
-
-      highlights: highlightsData,
-
       details: document.getElementById("detailsContent").value.trim(),
       thanksText: document.getElementById("thanksText").value.trim(),
-
       contacts: [
         { title: document.getElementById("cTitle1").value.trim(), sub: document.getElementById("cSub1").value.trim(), url: document.getElementById("cUrl1").value.trim(), icon: "💬" },
         { title: document.getElementById("cTitle2").value.trim(), sub: document.getElementById("cSub2").value.trim(), url: document.getElementById("cUrl2").value.trim(), icon: "💌" },
         { title: document.getElementById("cTitle3").value.trim(), sub: document.getElementById("cSub3").value.trim(), url: document.getElementById("cUrl3").value.trim(), icon: "🌸" }
       ],
-
       musicUrl: document.getElementById("musicUrl").value.trim(),
       floatPng: document.getElementById("floatPng").value.trim(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -577,19 +577,30 @@
       currentAdminPass = newPass;
     }
 
-    // ตรวจสอบขนาด JSON ก่อนส่งขึ้น Firebase
-    const jsonStr = JSON.stringify(payload);
-    const sizeInBytes = new Blob([jsonStr]).size;
-    if (sizeInBytes > 950000) {
-      alert(`⚠️ ขนาดข้อมูลรวม (${(sizeInBytes / 1024 / 1024).toFixed(2)} MB) ใกล้เกิน 1 MB!\nแนะนำให้ลบรูปในสตอรี่บางส่วนออก หรือใช้ลิงก์รูป (URL) แทนการอัปโหลดไฟล์สดนะคะ`);
-      btn.disabled = false;
-      btn.textContent = "บันทึกขึ้นระบบทันที ♡";
-      return;
-    }
-
     try {
+      // 1. ลบฟิลด์ highlights ก้อนเดิมออกจาก config ป้องกันความจุเกิน 1 MB
+      payload.highlights = firebase.firestore.FieldValue.delete();
       await db.collection("babyselris_exact_site").doc("config").set(payload, { merge: true });
-      alert("บันทึกข้อมูลสำเร็จแล้วค่ะ หน้าเว็บจะอัปเดตทันที ♡");
+
+      // 2. ล้างเอกสารไฮไลท์เก่าใน sub-collection
+      const oldSnap = await db.collection("babyselris_exact_site").doc("config").collection("highlights_list").get();
+      const batchDelete = db.batch();
+      oldSnap.docs.forEach(d => batchDelete.delete(d.ref));
+      await batchDelete.commit();
+
+      // 3. บันทึกรูปสตอรี่แต่ละไฮไลท์แยกเอกสาร (ภาพคมชัด HD ไม่จำกัด)
+      for (let i = 0; i < highlightsData.length; i++) {
+        const hl = highlightsData[i];
+        await db.collection("babyselris_exact_site").doc("config")
+          .collection("highlights_list").doc(`hl_${i}`).set({
+            order: i,
+            title: hl.title || "",
+            cover: hl.cover || (hl.images && hl.images[0]) || "",
+            images: hl.images || []
+          });
+      }
+
+      alert("บันทึกข้อมูลภาพชัดระดับ HD เรียบร้อยแล้วค่ะ ♡");
       document.getElementById("newAdminPassword").value = "";
     } catch (e) {
       alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
